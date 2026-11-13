@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Agendei</title>
+  <meta name="description" content="Checklist simples que funciona offline.">
+
+  <link rel="manifest" href="./manifest.webmanifest">
+  <meta name="theme-color" content="#0f766e">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Agendei">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <main class="app">
+    <header class="app-header">
+      <h1>Agendei</h1>
+      <p id="counter" class="counter" aria-live="polite">0 pendentes</p>
+    </header>
+
+    <form id="add-form" class="add-form" autocomplete="off">
+      <label for="new-item" class="sr-only">Novo item</label>
+      <input id="new-item" name="text" type="text" maxlength="200" required
+             placeholder="O que precisa fazer?" enterkeyhint="done">
+      <button type="submit" class="btn btn-primary">Adicionar</button>
+    </form>
+
+    <ul id="list" class="list" aria-label="Itens da checklist"></ul>
+
+    <p id="empty-state" class="empty-state">Nenhum item ainda.</p>
+
+    <footer class="app-footer">
+      <button type="button" id="clear-done" class="btn btn-ghost" disabled>Limpar concluídos</button>
+    </footer>
+
+    <noscript>
+      <p class="noscript">Este app precisa de JavaScript ativado para funcionar.</p>
+    </noscript>
+  </main>
+
+  <template id="item-template">
+    <li class="item">
+      <label class="item-check">
+        <input type="checkbox" class="item-toggle">
+        <span class="item-text"></span>
+      </label>
+      <div class="item-actions">
+        <button type="button" class="icon-btn item-edit" data-action="edit">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 20h4L19 9l-4-4L4 16v4zM14 6l4 4"/></svg>
+          <span class="sr-only">Editar</span>
+        </button>
+        <button type="button" class="icon-btn item-delete" data-action="delete">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13"/></svg>
+          <span class="sr-only">Excluir</span>
+        </button>
+      </div>
+    </li>
+  </template>
+</body>
+</html>
