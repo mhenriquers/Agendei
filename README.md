@@ -12,6 +12,7 @@ Checklist simples que funciona offline e pode ser instalado no celular ou no com
 - Visual claro em off-white, coral e amarelo-manteiga; check verde com fogos de artifício ao concluir
 - Painel **Personalizar** (engrenagem no topo): foto do perfil (duas prontas ou enviada), plano de fundo (cor sólida ou foto com desfoque) e exportar/importar a lista para levar a outro aparelho
 - Avisa quando há uma versão nova publicada
+- Ao abrir, o Bob Esponja aparece acenando e pergunta "O que faremos hoje?"
 
 Feito com HTML, CSS e JavaScript puros, sem build e sem dependências.
 
@@ -57,6 +58,7 @@ manifest.webmanifest   dados de instalação do PWA
 sw.js                  service worker (cache offline)
 icons/                 ícones PNG 192, 512 e 512 maskable
 avatars/               duas fotos de perfil prontas (192 px)
+img/                   Bob Esponja animado (WebP com fundo transparente)
 screenshots/           capturas usadas na janela de instalação
 .nojekyll              impede o GitHub Pages de processar o site com Jekyll
 ```

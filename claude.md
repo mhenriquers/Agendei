@@ -44,6 +44,9 @@ App de checklist (uma única lista) feito como PWA estático e publicado no GitH
 ├── avatars/
 │   ├── avatar-1.png       foto de perfil pronta (preto e branco, de logo.jpeg)
 │   └── avatar-2.png       foto de perfil pronta (colorida, de icons/icon-2.png)
+├── img/
+│   ├── bob.webp           Bob Esponja acenando, animado e com fundo transparente (347×320, 51 quadros)
+│   └── bob-parado.png     primeiro quadro, para quem pede movimento reduzido
 ├── screenshots/
 │   ├── wide.png           captura de PC (1280×800) para a janela de instalação
 │   └── narrow.png         captura de celular (540×960)
@@ -56,7 +59,7 @@ App de checklist (uma única lista) feito como PWA estático e publicado no GitH
 ## Especificação
 
 1. **Nome do repo e do app**: `Agendei`. `start_url: "./"` e `scope: "./"`, sem `id` no manifest (ver "Notas técnicas"), então o manifest funciona com qualquer nome de repo.
-2. **Funcionalidades**: adicionar item, marcar/desmarcar como feito (com fogos de artifício ao concluir), editar (texto, urgência e prazo), excluir item, limpar concluídos, contador de pendentes, estado vazio, aviso "vence hoje". Uma única lista. Painel Personalizar (foto do perfil e plano de fundo). Aviso de nova versão.
+2. **Funcionalidades**: adicionar item, marcar/desmarcar como feito (com fogos de artifício ao concluir), editar (texto, urgência e prazo), excluir item, limpar concluídos, contador de pendentes, estado vazio, aviso "vence hoje", boas-vindas do Bob Esponja ao abrir. Uma única lista. Painel Personalizar (foto do perfil e plano de fundo). Aviso de nova versão.
 3. **Regras de negócio**:
    - Texto obrigatório após `trim()`; espaços internos repetidos viram um só.
    - Máximo de 200 caracteres (`maxlength` no input + corte no JS).
@@ -87,6 +90,16 @@ Decidido com o usuário (as decisões marcadas com * foram tomadas sem perguntar
 - **Aviso "vence hoje":** faixa amarela abaixo do cabeçalho com "N tarefas vencem hoje", contando só pendentes com prazo para hoje (vencidas de dias anteriores não contam). Tocar leva até a primeira delas (rola, destaca o card e foca o check); o "×" esconde até o app abrir ou voltar para a tela (`visibilitychange`). Sem servidor, não há aviso com o app fechado; sem número no ícone (descartado pelo usuário).
 - **Relógio com o app aberto:** a cada 30 s o app compara um resumo dos estados de prazo (`clockSignature`) e só redesenha a lista se algo mudou (virada do dia, hora do prazo passando). O render devolve o foco ao mesmo controle; com o painel de edição aberto, espera.
 - **Painel "Editar tarefa"** (lápis do card; `<dialog id="editor">`): texto, urgência (rádios), data, hora e botão "Sem prazo". Enter no texto salva, Esc ou "Cancelar" fecham sem salvar, e o foco volta ao lápis do card.
+
+## Bob Esponja (boas-vindas)
+
+- Ao abrir o app (evento `load`, depois de 0,5 s), o Bob sobe do canto inferior direito acenando, com o balão **"O que faremos hoje?"** à esquerda (do lado da mão que acena). Tocar no Bob ou no balão foca o campo "O que precisa fazer?" e ele sai. Ele também sai sozinho depois de 8 s ou quando o campo ganha foco. Só aparece ao abrir, não ao voltar para o app.
+- O contêiner `#bob` tem `pointer-events: none` (só o Bob e o balão recebem toque), e com a faixa de atualização aberta (`body.has-update`) ele sobe para ficar acima dela. Com `prefers-reduced-motion`, o `<picture>` troca a animação por `img/bob-parado.png`.
+- **Origem da imagem:** o usuário forneceu `icons/bob.mp4` (1280×720, 3,4 s, fundo branco com faixas pretas; fica fora do git). Como MP4 não tem transparência e WebM com transparência não funciona no iPhone, o vídeo virou **WebP animado com alfa** (funciona em Chrome, Edge, Android e Safari 14+), gerado por um script Node que dirige o Edge (sem ffmpeg nesta máquina), guardado fora do repo:
+  - recorte: caixa calculada com todos os quadros (30 por segundo) + margem, reduzido para 320 px de altura, 15 quadros por segundo;
+  - fundo: branco quase puro e neutro ligado à borda do quadro vira transparente, com contorno suave (alfa pela "brancura" e cor descontaminada do branco, sem auréola);
+  - buracos: região branca **fechada** que é fundo em ≥ 50% dos outros quadros, com ≥ 150 px e cor média ≥ 249 também vira transparente (é o vão entre o braço e a cabeça, e entre o braço na cintura e o corpo). Olhos, dentes e camisa nunca são fundo; a manga, que muda de lugar, é pequena e sombreada. Limites tirados da medição de todas as regiões fechadas dos 51 quadros;
+  - montagem: cada quadro sai do canvas como WebP e é empacotado num RIFF com `VP8X` (alfa + animação), `ANIM` (repetição infinita) e um `ANMF` por quadro (67 ms).
 
 ## Painel Personalizar (`settings.js`)
 

@@ -73,6 +73,18 @@
     </noscript>
   </main>
 
+  <!-- Bob Esponja dando boas-vindas ao abrir o app. Tocar leva ao campo de nova tarefa. -->
+  <div id="bob" class="bob" hidden>
+    <button type="button" id="bob-bubble" class="bob-bubble">
+      O que faremos hoje?
+      <span class="sr-only">Toque para adicionar uma tarefa.</span>
+    </button>
+    <picture class="bob-figure" aria-hidden="true">
+      <source srcset="./img/bob-parado.png" media="(prefers-reduced-motion: reduce)">
+      <img src="./img/bob.webp" alt="" width="347" height="320">
+    </picture>
+  </div>
+
   <div id="update-banner" class="update-banner" role="status" hidden>
     <span>Nova versão disponível.</span>
     <button type="button" id="update-button" class="btn btn-primary">Atualizar</button>

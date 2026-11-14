@@ -508,6 +508,42 @@
     input.focus();
   });
 
+  // ===== Bob Esponja: boas-vindas ao abrir o app =====
+  // Sobe do canto de baixo perguntando "O que faremos hoje?". Tocar nele (ou no balão)
+  // leva ao campo de nova tarefa. Sai sozinho depois de BOB_DURATION ou quando a
+  // pessoa começa a digitar.
+  var bob = document.getElementById('bob');
+  var BOB_DELAY = 500;
+  var BOB_DURATION = 8000;
+  var bobTimer = null;
+
+  function showBob() {
+    bob.hidden = false;
+    bob.classList.remove('is-out');
+    bob.classList.add('is-in');
+    bobTimer = setTimeout(hideBob, BOB_DURATION);
+  }
+
+  function hideBob() {
+    if (bob.hidden || bob.classList.contains('is-out')) return;
+    clearTimeout(bobTimer);
+    bob.classList.remove('is-in');
+    bob.classList.add('is-out');
+    setTimeout(function () {
+      bob.hidden = true;
+      bob.classList.remove('is-out');
+    }, reduceMotion && reduceMotion.matches ? 0 : 320);
+  }
+
+  bob.addEventListener('click', function () {
+    hideBob();
+    input.focus();
+  });
+  input.addEventListener('focus', hideBob);
+  window.addEventListener('load', function () {
+    setTimeout(showBob, BOB_DELAY);
+  });
+
   // Voltou para o app: o aviso aparece de novo e os prazos são recalculados.
   document.addEventListener('visibilitychange', function () {
     if (document.visibilityState === 'visible') {

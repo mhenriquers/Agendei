@@ -508,6 +508,97 @@ output {
   background: rgba(0, 0, 0, 0.45);
 }
 
+/* ===== Bob Esponja: boas-vindas ao abrir o app ===== */
+/* Fica no canto de baixo, acenando, com o balão à esquerda (do lado da mão que acena). */
+.bob {
+  position: fixed;
+  right: calc(var(--space-2) + env(safe-area-inset-right, 0px));
+  bottom: calc(var(--space-2) + env(safe-area-inset-bottom, 0px));
+  z-index: 15;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-1);
+  pointer-events: none; /* só o Bob e o balão recebem toque; o resto da tela continua clicável */
+}
+
+.bob > * {
+  pointer-events: auto;
+}
+
+.bob-figure {
+  display: block;
+  cursor: pointer;
+}
+
+.bob-figure img {
+  display: block;
+  width: auto;
+  height: 140px;
+  filter: drop-shadow(0 4px 8px rgba(61, 52, 49, 0.18));
+}
+
+.bob-bubble {
+  position: relative;
+  margin-bottom: 78px;
+  max-width: 170px;
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(61, 52, 49, 0.18);
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* Pontinha do balão apontando para o Bob. */
+.bob-bubble::after {
+  content: "";
+  position: absolute;
+  right: -7px;
+  bottom: 14px;
+  width: 12px;
+  height: 12px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  transform: rotate(-45deg);
+}
+
+.bob.is-in {
+  animation: bob-in 500ms cubic-bezier(0.2, 0.8, 0.3, 1.15) both;
+}
+
+.bob.is-in .bob-bubble {
+  animation: bob-bubble-in 300ms 400ms ease-out both;
+}
+
+.bob.is-out {
+  animation: bob-out 300ms ease-in both;
+}
+
+@keyframes bob-in {
+  from { transform: translateY(110%); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+@keyframes bob-bubble-in {
+  from { transform: scale(0.6); transform-origin: right bottom; opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+@keyframes bob-out {
+  from { transform: none; opacity: 1; }
+  to { transform: translateY(110%); opacity: 0; }
+}
+
+/* Com a faixa de atualização aberta, o Bob fica acima dela. */
+body.has-update .bob {
+  bottom: calc(var(--space-4) + 80px + env(safe-area-inset-bottom, 0px));
+}
+
 /* ===== Aviso de atualização ===== */
 .update-banner {
   position: fixed;
