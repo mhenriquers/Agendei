@@ -12,7 +12,7 @@ Checklist simples que funciona offline e pode ser instalado no celular ou no com
 - Visual claro em off-white, coral e amarelo-manteiga; check verde com fogos de artifício ao concluir
 - Painel **Personalizar** (engrenagem no topo): foto do perfil (duas prontas ou enviada), plano de fundo (cor sólida ou foto com desfoque) e exportar/importar a lista para levar a outro aparelho
 - Avisa quando há uma versão nova publicada
-- Ao abrir, o Bob Esponja aparece acenando e pergunta "O que faremos hoje?"
+- Ao abrir (e ao voltar para o app), o Bob Esponja aparece acenando e pergunta "O que faremos hoje?"
 
 Feito com HTML, CSS e JavaScript puros, sem build e sem dependências.
 

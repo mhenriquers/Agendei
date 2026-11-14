@@ -93,7 +93,7 @@ Decidido com o usuário (as decisões marcadas com * foram tomadas sem perguntar
 
 ## Bob Esponja (boas-vindas)
 
-- Ao abrir o app (evento `load`, depois de 0,5 s), o Bob sobe do canto inferior direito acenando, com o balão **"O que faremos hoje?"** à esquerda (do lado da mão que acena). Tocar no Bob ou no balão foca o campo "O que precisa fazer?" e ele sai. Ele também sai sozinho depois de 8 s ou quando o campo ganha foco. Só aparece ao abrir, não ao voltar para o app.
+- Ao abrir o app (evento `load`) e sempre que a pessoa volta para ele (`visibilitychange`), depois de 0,5 s, o Bob sobe do canto inferior direito acenando, com o balão **"O que faremos hoje?"** à esquerda (do lado da mão que acena). Tocar no Bob ou no balão foca o campo "O que precisa fazer?" e ele sai. Ele também sai sozinho depois de 8 s ou quando o campo ganha foco. Não aparece se houver um painel aberto (`dialog[open]`) ou se o campo estiver com foco, e não reinicia a animação se ainda estiver na tela.
 - O contêiner `#bob` tem `pointer-events: none` (só o Bob e o balão recebem toque), e com a faixa de atualização aberta (`body.has-update`) ele sobe para ficar acima dela. Com `prefers-reduced-motion`, o `<picture>` troca a animação por `img/bob-parado.png`.
 - **Origem da imagem:** o usuário forneceu `icons/bob.mp4` (1280×720, 3,4 s, fundo branco com faixas pretas; fica fora do git). Como MP4 não tem transparência e WebM com transparência não funciona no iPhone, o vídeo virou **WebP animado com alfa** (funciona em Chrome, Edge, Android e Safari 14+), gerado por um script Node que dirige o Edge (sem ffmpeg nesta máquina), guardado fora do repo:
   - recorte: caixa calculada com todos os quadros (30 por segundo) + margem, reduzido para 320 px de altura, 15 quadros por segundo;
@@ -160,6 +160,7 @@ Para simular o GitHub Pages (subpasta), rode o mesmo comando em `c:/dev` e abra 
 **Testes automatizados (fora do repo):** dá para dirigir o Edge sem janela pelo DevTools Protocol com um script Node (Node 24 tem `fetch` e `WebSocket` globais, sem instalar nada), guardado na pasta temporária. Cuidados aprendidos:
 - `msedge --headless --screenshot` não renderiza larguras menores que ~500 px e fecha antes do SW verificar atualizações. Para larguras de celular e para testar o SW, use o protocolo (`Emulation.setDeviceMetricsOverride`, `Page.captureScreenshot`).
 - Para testar atualização, sirva uma **cópia** do app com `-c600`, altere a cópia (`CACHE_NAME` e um texto visível) e recarregue.
+- Servidor iniciado em segundo plano dentro de um comando com pipe (`… | grep`) prende o pipe e o comando nunca termina: inicie com `</dev/null >/dev/null 2>&1` também no subshell, ou antes do comando.
 - `DOM.setFileInputFiles` simula a escolha de arquivos no painel Personalizar.
 
 ## Ambiente de desenvolvimento

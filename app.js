@@ -508,31 +508,50 @@
     input.focus();
   });
 
-  // ===== Bob Esponja: boas-vindas ao abrir o app =====
+  // ===== Bob Esponja: boas-vindas ao abrir e ao voltar para o app =====
   // Sobe do canto de baixo perguntando "O que faremos hoje?". Tocar nele (ou no balão)
   // leva ao campo de nova tarefa. Sai sozinho depois de BOB_DURATION ou quando a
   // pessoa começa a digitar.
   var bob = document.getElementById('bob');
   var BOB_DELAY = 500;
   var BOB_DURATION = 8000;
-  var bobTimer = null;
+  var bobTimer = null;     // saída automática
+  var bobHideTimer = null; // fim da animação de saída
+  var bobDelayTimer = null;
+
+  function bobVisible() {
+    return !bob.hidden && !bob.classList.contains('is-out');
+  }
 
   function showBob() {
+    if (bobVisible()) return; // já está na tela: não reinicia a animação
+    clearTimeout(bobHideTimer);
     bob.hidden = false;
     bob.classList.remove('is-out');
     bob.classList.add('is-in');
+    clearTimeout(bobTimer);
     bobTimer = setTimeout(hideBob, BOB_DURATION);
   }
 
   function hideBob() {
-    if (bob.hidden || bob.classList.contains('is-out')) return;
+    clearTimeout(bobDelayTimer);
+    if (!bobVisible()) return;
     clearTimeout(bobTimer);
     bob.classList.remove('is-in');
     bob.classList.add('is-out');
-    setTimeout(function () {
+    bobHideTimer = setTimeout(function () {
       bob.hidden = true;
       bob.classList.remove('is-out');
     }, reduceMotion && reduceMotion.matches ? 0 : 320);
+  }
+
+  // Não cumprimenta com um painel aberto nem com a pessoa digitando no campo.
+  function greetSoon() {
+    clearTimeout(bobDelayTimer);
+    bobDelayTimer = setTimeout(function () {
+      if (document.querySelector('dialog[open]') || document.activeElement === input) return;
+      showBob();
+    }, BOB_DELAY);
   }
 
   bob.addEventListener('click', function () {
@@ -540,15 +559,14 @@
     input.focus();
   });
   input.addEventListener('focus', hideBob);
-  window.addEventListener('load', function () {
-    setTimeout(showBob, BOB_DELAY);
-  });
+  window.addEventListener('load', greetSoon);
 
-  // Voltou para o app: o aviso aparece de novo e os prazos são recalculados.
+  // Voltou para o app: o aviso aparece de novo, os prazos são recalculados e o Bob cumprimenta.
   document.addEventListener('visibilitychange', function () {
     if (document.visibilityState === 'visible') {
       dueDismissed = false;
       render();
+      greetSoon();
     }
   });
 
