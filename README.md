@@ -1,5 +1,7 @@
 # Agendei
 
+**Acesse:** https://mhenriquers.github.io/Agendei/
+
 Checklist simples que funciona offline e pode ser instalado no celular ou no computador (PWA).
 
 - Adicionar, marcar como feito, editar e excluir itens

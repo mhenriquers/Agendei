@@ -154,4 +154,4 @@ Cada subtarefa é pensada para ser resolvida de uma vez, mas sempre olhando o tr
 - [x] **M7.3** Settings → Pages → Source: “Deploy from a branch”, branch `main`, pasta `/ (root)`. — Estava como "GitHub Actions" sem workflow (404); trocado via `gh api` em 2026-11-14.
 - [ ] **M7.4** Abrir `https://<usuario>.github.io/<repo>/` e repetir os itens de PWA do M6.2 (instalar, offline, Lighthouse).
 - [ ] **M7.5** Testar instalação no celular (Android/Chrome e iOS/Safari “Adicionar à Tela de Início”).
-- [ ] **M7.6** Atualizar o README com a URL pública.
+- [x] **M7.6** Atualizar o README com a URL pública.
