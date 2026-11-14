@@ -219,7 +219,7 @@
   // sequência, saindo do ponto onde o check estava. Posição fixa na tela,
   // porque o item concluído muda de lugar na lista logo em seguida.
   var reduceMotion = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
-  var SPARK_COLORS = ['#22c55e', '#facc15', '#f472b6', '#38bdf8', '#fb923c', '#ffffff'];
+  var SPARK_COLORS = ['#2f9e6a', '#f2b631', '#ec6fa0', '#3aa6d9', '#e2725b', '#9b7bd8'];
   var BURSTS = [
     { dx: 0, dy: 0, delay: 0 },
     { dx: -16, dy: -14, delay: 140 },

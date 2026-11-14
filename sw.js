@@ -12,7 +12,7 @@
  */
 'use strict';
 
-var CACHE_NAME = 'checklist-v6';
+var CACHE_NAME = 'checklist-v7';
 
 var ASSETS = [
   './',

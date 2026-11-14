@@ -8,13 +8,13 @@
   <meta name="description" content="Checklist simples que funciona offline.">
 
   <link rel="manifest" href="./manifest.webmanifest">
-  <meta name="theme-color" content="#262626">
+  <meta name="theme-color" content="#fbf6ee">
   <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Agendei">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
   <link rel="stylesheet" href="./styles.css">
   <script src="./settings.js" defer></script>
@@ -65,14 +65,14 @@
     <button type="button" id="update-button" class="btn btn-primary">Atualizar</button>
   </div>
 
-  <dialog id="settings" class="settings" aria-labelledby="settings-title">
-    <form method="dialog" class="settings-form">
+  <dialog id="settings" class="panel" aria-labelledby="settings-title">
+    <form method="dialog" class="panel-form">
       <h2 id="settings-title">Personalizar</h2>
 
       <fieldset>
         <legend>Foto do perfil</legend>
         <p class="hint">Aparece no topo do app e na aba do navegador. O ícone do app instalado não muda: ele é fixo no site.</p>
-        <div class="settings-row">
+        <div class="panel-row">
           <label class="btn btn-ghost file-btn">
             Escolher foto
             <input type="file" id="avatar-file" accept="image/*" class="sr-only">
@@ -83,25 +83,25 @@
 
       <fieldset>
         <legend>Plano de fundo</legend>
-        <div class="settings-row">
+        <div class="panel-row">
           <label class="choice"><input type="radio" name="bg-type" value="default"> Padrão</label>
           <label class="choice"><input type="radio" name="bg-type" value="color"> Cor sólida</label>
           <label class="choice"><input type="radio" name="bg-type" value="photo"> Foto</label>
         </div>
 
-        <div id="bg-color-options" class="settings-sub" hidden>
+        <div id="bg-color-options" class="panel-sub" hidden>
           <div class="swatches">
-            <button type="button" class="swatch" data-color="#000000" style="background:#000000"><span class="sr-only">Preto</span></button>
-            <button type="button" class="swatch" data-color="#262626" style="background:#262626"><span class="sr-only">Grafite escuro</span></button>
-            <button type="button" class="swatch" data-color="#404040" style="background:#404040"><span class="sr-only">Grafite</span></button>
-            <button type="button" class="swatch" data-color="#737373" style="background:#737373"><span class="sr-only">Cinza</span></button>
-            <button type="button" class="swatch" data-color="#d4d4d4" style="background:#d4d4d4"><span class="sr-only">Cinza claro</span></button>
-            <button type="button" class="swatch" data-color="#ffffff" style="background:#ffffff"><span class="sr-only">Branco</span></button>
+            <button type="button" class="swatch" data-color="#fbf6ee" style="background:#fbf6ee"><span class="sr-only">Areia (padrão)</span></button>
+            <button type="button" class="swatch" data-color="#f8e1e4" style="background:#f8e1e4"><span class="sr-only">Rosa</span></button>
+            <button type="button" class="swatch" data-color="#fbf0c9" style="background:#fbf0c9"><span class="sr-only">Amarelo-manteiga</span></button>
+            <button type="button" class="swatch" data-color="#dcebf3" style="background:#dcebf3"><span class="sr-only">Azul-céu</span></button>
+            <button type="button" class="swatch" data-color="#e3f1e8" style="background:#e3f1e8"><span class="sr-only">Menta</span></button>
+            <button type="button" class="swatch" data-color="#3d3431" style="background:#3d3431"><span class="sr-only">Chocolate</span></button>
           </div>
-          <label class="color-pick">Outra cor <input type="color" id="bg-color" value="#262626"></label>
+          <label class="color-pick">Outra cor <input type="color" id="bg-color" value="#fbf6ee"></label>
         </div>
 
-        <div id="bg-photo-options" class="settings-sub" hidden>
+        <div id="bg-photo-options" class="panel-sub" hidden>
           <label class="btn btn-ghost file-btn">
             Escolher foto
             <input type="file" id="bg-file" accept="image/*" class="sr-only">
@@ -112,7 +112,7 @@
         </div>
       </fieldset>
 
-      <div class="settings-actions">
+      <div class="panel-actions">
         <button type="submit" class="btn btn-primary">Fechar</button>
       </div>
     </form>
@@ -122,7 +122,10 @@
     <li class="item">
       <label class="item-check">
         <input type="checkbox" class="item-toggle">
-        <span class="item-text"></span>
+        <span class="item-body">
+          <span class="item-text"></span>
+          <span class="item-meta" hidden></span>
+        </span>
       </label>
       <div class="item-actions">
         <button type="button" class="icon-btn item-edit" data-action="edit">

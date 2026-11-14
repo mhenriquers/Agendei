@@ -7,7 +7,8 @@
  */
 (function () {
   var SETTINGS_KEY = 'checklist.settings.v1';
-  var DEFAULT_BG = '#262626';
+  var DEFAULT_BG = '#fbf6ee';
+  var PHOTO_THEME = '#3d3431'; // cor da barra do sistema com foto de fundo (escurecida)
   var MAX_BLUR = 20;
 
   var defaults = { bgType: 'default', bgColor: DEFAULT_BG, bgPhoto: null, bgBlur: 0, avatar: null };
@@ -86,9 +87,10 @@
     var color = useColor ? settings.bgColor : DEFAULT_BG;
 
     root.style.setProperty('--bg', color);
-    root.classList.toggle('bg-light', !usePhoto && luminance(color) > 0.3);
+    // Fundo escuro ou foto: texto claro sobre o fundo (classe .bg-dark).
+    root.classList.toggle('bg-dark', Boolean(usePhoto) || luminance(color) <= 0.3);
     root.classList.toggle('bg-photo', Boolean(usePhoto));
-    if (themeMeta) themeMeta.setAttribute('content', usePhoto ? DEFAULT_BG : color);
+    if (themeMeta) themeMeta.setAttribute('content', usePhoto ? PHOTO_THEME : color);
 
     if (usePhoto) {
       // A data URL vem do canvas (base64), sem aspas: segura dentro de url("...").

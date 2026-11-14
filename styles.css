@@ -1,51 +1,58 @@
 /* ===== Tokens ===== */
-/* Tema único, monocromático (preto e branco), com fundo um pouco mais escuro que grafite. */
+/* Paleta "Areia e coral": off-white quente, coral e amarelo-manteiga.
+   Tons ajustados para contraste AA (texto branco no botão, ✓ branco no check). */
 :root {
-  --accent: #f5f5f5;
-  --accent-hover: #d4d4d4;
-  --accent-contrast: #171717;
-  --bg: #262626;
-  --surface: #333333;
-  --text: #f5f5f5;
-  --muted: #a3a3a3;
-  --border: #737373;
-  --danger: #ffffff;
-  --focus: #f5f5f5;
-  --check: #15803d;
+  --bg: #fbf6ee;
+  --surface: #ffffff;
+  --surface-soft: #f6efe4;
+  --text: #3d3431;
+  --muted: #6f645e;
+  --border: #e6dacb;
+  --field-border: #9c8d7c;
+
+  --accent: #c0503b;          /* botão principal (texto branco AA) */
+  --accent-hover: #a8432f;
+  --accent-contrast: #ffffff;
+  --coral: #e2725b;           /* detalhe: aro do avatar, seleção */
+  --butter: #f5d565;          /* detalhe amarelo-manteiga */
+  --butter-soft: #fff3c9;
+  --butter-text: #6b4f00;
+
+  --check: #2f7d57;           /* escuro o bastante para o navegador desenhar o ✓ branco */
+  --high: #d6564b;            /* urgência alta (faixa do card) */
+  --high-soft: #fbe3df;
+  --high-text: #a63a31;
+  --late: #b23b30;            /* etiqueta "Atrasada" (texto branco AA) */
+  --low: #7fb3cf;             /* urgência baixa (faixa do card) */
+  --low-soft: #e3f0f7;
+  --low-text: #356a86;
+
+  --danger: #b3261e;
+  --focus: #3d3431;
 
   /* Cores do que fica direto sobre o fundo (título, contador, estado vazio, rodapé).
-     Mudam quando o usuário escolhe um fundo claro (classe .bg-light no <html>). */
-  --on-bg: #f5f5f5;
-  --on-bg-muted: #a3a3a3;
-  --on-bg-border: #737373;
+     Mudam quando o fundo escolhido é escuro ou foto (classe .bg-dark no <html>). */
+  --on-bg: #3d3431;
+  --on-bg-muted: #6f645e;
+  --on-bg-border: #9c8d7c;
 
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
   --space-4: 16px;
   --space-6: 24px;
-  --radius: 10px;
+  --radius: 12px;
   --tap: 44px;
   --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
-  color-scheme: dark;
+  color-scheme: light;
 }
 
-/* Fundo claro escolhido pelo usuário: texto escuro sobre ele. */
-:root.bg-light {
-  --on-bg: #171717;
-  --on-bg-muted: #404040;
-  --on-bg-border: #525252;
-}
-
-/* Botão branco sumiria num fundo claro: inverte para escuro. */
-:root.bg-light .add-form .btn-primary {
-  background: #171717;
-  color: #f5f5f5;
-}
-
-:root.bg-light .add-form .btn-primary:hover {
-  background: #404040;
+/* Fundo escuro ou foto escolhidos pelo usuário: texto claro sobre ele. */
+:root.bg-dark {
+  --on-bg: #fbf6ee;
+  --on-bg-muted: #e3d9ce;
+  --on-bg-border: #b7a99a;
 }
 
 /* Fundo com foto: sombra no texto para ler sobre qualquer imagem. */
@@ -82,6 +89,7 @@ body {
 }
 
 h1,
+h2,
 p,
 ul {
   margin: 0;
@@ -140,7 +148,7 @@ output {
   height: 48px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid var(--on-bg-border);
+  border: 2px solid var(--coral);
 }
 
 .app-title {
@@ -166,7 +174,7 @@ output {
 }
 
 .app-header .icon-btn:hover {
-  background: rgba(127, 127, 127, 0.25);
+  background: rgba(127, 127, 127, 0.18);
   color: var(--on-bg);
 }
 
@@ -191,14 +199,14 @@ output {
 }
 
 .btn-ghost {
-  background: transparent;
+  background: var(--surface);
   color: var(--muted);
-  border-color: var(--border);
+  border-color: var(--field-border);
 }
 
 .btn-ghost:hover:not(:disabled) {
-  color: var(--danger);
-  border-color: var(--danger);
+  color: var(--text);
+  border-color: var(--text);
 }
 
 .btn:disabled {
@@ -231,7 +239,7 @@ output {
 }
 
 .icon-btn:hover {
-  background: var(--bg);
+  background: var(--surface-soft);
   color: var(--text);
 }
 
@@ -246,18 +254,62 @@ output {
 }
 
 .add-form input,
-.edit-input {
+.field input {
   flex: 1;
   min-width: 0;
   min-height: var(--tap);
   padding: 0 var(--space-3);
   background: var(--surface);
-  border: 1px solid var(--border);
+  border: 1px solid var(--field-border);
   border-radius: var(--radius);
 }
 
 .add-form input::placeholder {
   color: var(--muted);
+}
+
+/* ===== Aviso "vence hoje" ===== */
+.due-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  background: var(--butter-soft);
+  color: var(--butter-text);
+  border: 1px solid var(--butter);
+  border-radius: var(--radius);
+}
+
+.due-banner-open {
+  flex: 1;
+  min-height: var(--tap);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-3);
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius);
+  color: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.due-banner-dot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--high);
+}
+
+.due-banner .icon-btn {
+  color: var(--butter-text);
+}
+
+.due-banner .icon-btn:hover {
+  background: rgba(107, 79, 0, 0.1);
+  color: var(--butter-text);
 }
 
 /* ===== Lista ===== */
@@ -277,6 +329,28 @@ output {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
+  box-shadow: 0 1px 2px rgba(61, 52, 49, 0.06);
+}
+
+/* Faixa de urgência na lateral (Normal não tem faixa). */
+.item.prio-high {
+  border-left: 4px solid var(--high);
+  padding-left: calc(var(--space-3) - 3px);
+}
+
+.item.prio-low {
+  border-left: 4px solid var(--low);
+  padding-left: calc(var(--space-3) - 3px);
+}
+
+/* Destaque rápido quando o aviso "vence hoje" leva até o card. */
+.item.flash {
+  animation: item-flash 1.2s ease-out;
+}
+
+@keyframes item-flash {
+  0%, 40% { background: var(--butter-soft); }
+  100% { background: var(--surface); }
 }
 
 .item-check {
@@ -294,9 +368,71 @@ output {
   width: 22px;
   height: 22px;
   margin: 0;
-  /* Única cor fora do preto e branco: o check verde de "concluído". */
   accent-color: var(--check);
   cursor: pointer;
+}
+
+.item-body {
+  min-width: 0;
+  padding: var(--space-2) 0;
+}
+
+.item-text {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.item.done .item-text {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+
+.item-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-top: 2px;
+}
+
+.tag {
+  display: inline-block;
+  padding: 0 var(--space-2);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.tag-high { background: var(--high-soft); color: var(--high-text); }
+.tag-low { background: var(--low-soft); color: var(--low-text); }
+.tag-due { background: var(--surface-soft); color: var(--muted); }
+.tag-today { background: var(--butter-soft); color: var(--butter-text); }
+.tag-late { background: var(--late); color: #ffffff; }
+
+.item.done .tag {
+  opacity: 0.6;
+}
+
+.item-actions {
+  flex: none;
+  display: flex;
+}
+
+/* Edição por linha (substituída pelo painel "Editar tarefa" na funcionalidade de prazo). */
+.item.editing .item-check,
+.item.editing .item-actions {
+  display: none;
+}
+
+.edit-input {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--tap);
+  margin: var(--space-1) 0;
+  padding: 0 var(--space-3);
+  background: var(--surface);
+  border: 1px solid var(--field-border);
+  border-radius: var(--radius);
 }
 
 /* "Pulo" do check no item que acabou de ser concluído. */
@@ -347,8 +483,8 @@ output {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 0 8px 2px rgba(255, 255, 255, 0.8);
+  background: var(--butter);
+  box-shadow: 0 0 8px 2px rgba(245, 213, 101, 0.9);
   opacity: 0;
   animation: firework-flash 300ms ease-out both;
 }
@@ -357,31 +493,6 @@ output {
   0% { transform: scale(0.2); opacity: 0; }
   30% { opacity: 1; }
   100% { transform: scale(1.4); opacity: 0; }
-}
-
-.item-text {
-  min-width: 0;
-  overflow-wrap: anywhere;
-  padding: var(--space-2) 0;
-}
-
-.item.done .item-text {
-  color: var(--muted);
-  text-decoration: line-through;
-}
-
-.item-actions {
-  flex: none;
-  display: flex;
-}
-
-.item.editing .item-check,
-.item.editing .item-actions {
-  display: none;
-}
-
-.edit-input {
-  margin: var(--space-1) 0;
 }
 
 /* ===== Estado vazio / rodapé ===== */
@@ -400,6 +511,7 @@ output {
 
 /* O botão do rodapé fica sobre o fundo, não sobre um cartão. */
 .app-footer .btn-ghost {
+  background: transparent;
   color: var(--on-bg-muted);
   border-color: var(--on-bg-border);
 }
@@ -411,7 +523,6 @@ output {
 
 :root.bg-photo .app-footer .btn-ghost {
   background: rgba(0, 0, 0, 0.45);
-  color: var(--text);
 }
 
 /* ===== Aviso de atualização ===== */
@@ -431,7 +542,7 @@ output {
   color: var(--text);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 6px 20px rgba(61, 52, 49, 0.2);
 }
 
 /* Com a faixa visível, abre espaço no fim da página para ela não cobrir "Limpar concluídos". */
@@ -439,8 +550,8 @@ body.has-update .app {
   padding-bottom: calc(var(--space-6) + 80px + env(safe-area-inset-bottom, 0px));
 }
 
-/* ===== Painel Personalizar ===== */
-.settings {
+/* ===== Painéis (Personalizar e Editar tarefa) ===== */
+.panel {
   width: min(480px, calc(100% - 2 * var(--space-4)));
   max-height: calc(100dvh - 2 * var(--space-4));
   padding: 0;
@@ -448,25 +559,25 @@ body.has-update .app {
   color: var(--text);
   border: 1px solid var(--border);
   border-radius: var(--radius);
+  box-shadow: 0 12px 32px rgba(61, 52, 49, 0.25);
 }
 
-.settings::backdrop {
-  background: rgba(0, 0, 0, 0.6);
+.panel::backdrop {
+  background: rgba(61, 52, 49, 0.45);
 }
 
-.settings-form {
+.panel-form {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
   padding: var(--space-4);
 }
 
-.settings h2 {
-  margin: 0;
+.panel h2 {
   font-size: 1.25rem;
 }
 
-.settings fieldset {
+.panel fieldset {
   margin: 0;
   padding: var(--space-3);
   display: flex;
@@ -476,30 +587,53 @@ body.has-update .app {
   border-radius: var(--radius);
 }
 
-.settings legend {
+.panel legend {
   padding: 0 var(--space-1);
   font-weight: 600;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-weight: 600;
+}
+
+.field input {
+  font-weight: 400;
+}
+
+.field-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.field-row .field {
+  flex: 1 1 140px;
 }
 
 .hint {
   color: var(--muted);
   font-size: 0.875rem;
+  font-weight: 400;
 }
 
-.settings-row {
+.panel-row {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: var(--space-2);
 }
 
-.settings-sub {
+.panel-sub {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: var(--space-3);
 }
 
-/* Botão "Escolher foto": é um <label> com o <input type="file"> escondido dentro. */
+/* Botão "Escolher foto"/"Importar": é um <label> com o <input type="file"> escondido dentro. */
 .file-btn {
   display: inline-flex;
   align-items: center;
@@ -508,7 +642,7 @@ body.has-update .app {
 .file-btn:focus-within {
   outline: 3px solid var(--focus);
   outline-offset: 2px;
-  box-shadow: 0 0 0 2px #000;
+  box-shadow: 0 0 0 2px #ffffff;
 }
 
 .choice {
@@ -527,6 +661,30 @@ body.has-update .app {
   accent-color: var(--accent);
 }
 
+/* Fotos de perfil prontas. */
+.avatar-option {
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface-soft);
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.avatar-option img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-option[aria-pressed="true"] {
+  border-color: var(--coral);
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--coral);
+}
+
 .swatches {
   display: flex;
   flex-wrap: wrap;
@@ -537,14 +695,14 @@ body.has-update .app {
   width: var(--tap);
   height: var(--tap);
   padding: 0;
-  border: 2px solid var(--border);
+  border: 2px solid var(--field-border);
   border-radius: 50%;
   cursor: pointer;
 }
 
 .swatch[aria-pressed="true"] {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent);
+  border-color: var(--coral);
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--coral);
 }
 
 .color-pick {
@@ -558,7 +716,7 @@ body.has-update .app {
   height: var(--tap);
   padding: 2px;
   background: transparent;
-  border: 1px solid var(--border);
+  border: 1px solid var(--field-border);
   border-radius: var(--radius);
   cursor: pointer;
 }
@@ -567,18 +725,19 @@ body.has-update .app {
   font-weight: 600;
 }
 
-.settings input[type="range"] {
+.panel input[type="range"] {
   width: 100%;
   accent-color: var(--accent);
 }
 
-.settings input[type="range"]:disabled {
+.panel input[type="range"]:disabled {
   opacity: 0.5;
 }
 
-.settings-actions {
+.panel-actions {
   display: flex;
   justify-content: flex-end;
+  gap: var(--space-2);
 }
 
 .noscript {
@@ -593,11 +752,11 @@ body.has-update .app {
 }
 
 /* ===== Acessibilidade ===== */
-/* Contorno branco com anel preto por dentro: visível em fundo escuro, claro ou foto. */
+/* Contorno escuro com anel branco por dentro: visível em fundo claro, escuro ou foto. */
 :focus-visible {
   outline: 3px solid var(--focus);
   outline-offset: 2px;
-  box-shadow: 0 0 0 2px #000;
+  box-shadow: 0 0 0 2px #ffffff;
 }
 
 .sr-only {

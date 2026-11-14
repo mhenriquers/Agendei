@@ -8,7 +8,7 @@ Checklist simples que funciona offline e pode ser instalado no celular ou no com
 - "Limpar concluídos" remove de uma vez todos os itens feitos
 - Os dados ficam salvos no próprio navegador (`localStorage`, chaves `checklist.items.v1` e `checklist.settings.v1`); não há conta nem servidor
 - Funciona sem internet depois do primeiro acesso
-- Visual monocromático (preto e branco) com fundo escuro
+- Visual claro em off-white, coral e amarelo-manteiga; check verde com fogos de artifício ao concluir
 - Painel **Personalizar** (engrenagem no topo): foto do perfil e plano de fundo (cor sólida ou foto com desfoque)
 - Avisa quando há uma versão nova publicada
 
@@ -49,7 +49,7 @@ Na próxima vez que alguém abrir o app (ou voltar para ele), aparece a faixa "N
 
 ```
 index.html             estrutura da página
-styles.css             visual (monocromático escuro, responsivo)
+styles.css             visual (paleta areia e coral, responsiva)
 settings.js            painel Personalizar (foto do perfil e plano de fundo)
 app.js                 itens, persistência e aviso de nova versão
 manifest.webmanifest   dados de instalação do PWA
