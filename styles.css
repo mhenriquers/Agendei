@@ -509,10 +509,10 @@ output {
 }
 
 /* ===== Bob Esponja: boas-vindas ao abrir o app ===== */
-/* Fica no canto de baixo, acenando, com o balão à direita dele. */
+/* Fica no canto inferior esquerdo, acenando, com o balão à direita dele. */
 .bob {
   position: fixed;
-  right: calc(var(--space-2) + env(safe-area-inset-right, 0px));
+  left: calc(var(--space-2) + env(safe-area-inset-left, 0px));
   bottom: calc(var(--space-2) + env(safe-area-inset-bottom, 0px));
   z-index: 15;
   display: flex;
