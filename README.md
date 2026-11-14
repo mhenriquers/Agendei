@@ -6,9 +6,11 @@ Checklist simples que funciona offline e pode ser instalado no celular ou no com
 
 - Adicionar, marcar como feito, editar e excluir itens
 - "Limpar concluídos" remove de uma vez todos os itens feitos
-- Os dados ficam salvos no próprio navegador (`localStorage`, chave `checklist.items.v1`); não há conta nem servidor
+- Os dados ficam salvos no próprio navegador (`localStorage`, chaves `checklist.items.v1` e `checklist.settings.v1`); não há conta nem servidor
 - Funciona sem internet depois do primeiro acesso
 - Visual monocromático (preto e branco) com fundo escuro
+- Painel **Personalizar** (engrenagem no topo): foto do perfil e plano de fundo (cor sólida ou foto com desfoque)
+- Avisa quando há uma versão nova publicada
 
 Feito com HTML, CSS e JavaScript puros, sem build e sem dependências.
 
@@ -41,16 +43,18 @@ Quem já abriu o app recebe os arquivos do cache do service worker. Ao mudar **q
 2. Se criou ou renomeou arquivos, atualize a lista `ASSETS` no mesmo arquivo.
 3. Faça commit e push.
 
-Na próxima visita o navegador baixa a versão nova e apaga o cache antigo. Às vezes é preciso fechar e abrir o app de novo para ver a mudança.
+Na próxima vez que alguém abrir o app (ou voltar para ele), aparece a faixa "Nova versão disponível". Tocando em **Atualizar**, o app recarrega na versão nova.
 
 ## Estrutura
 
 ```
 index.html             estrutura da página
 styles.css             visual (monocromático escuro, responsivo)
-app.js                 estado, renderização, eventos e persistência
+settings.js            painel Personalizar (foto do perfil e plano de fundo)
+app.js                 itens, persistência e aviso de nova versão
 manifest.webmanifest   dados de instalação do PWA
 sw.js                  service worker (cache offline)
 icons/                 ícones PNG 192, 512 e 512 maskable
+screenshots/           capturas usadas na janela de instalação
 .nojekyll              impede o GitHub Pages de processar o site com Jekyll
 ```

@@ -268,10 +268,69 @@
 
   render();
 
-  // ===== Service worker =====
+  // ===== Service worker e aviso de atualização =====
   if ('serviceWorker' in navigator) {
+    var updateBanner = document.getElementById('update-banner');
+    var updateButton = document.getElementById('update-button');
+    var waitingWorker = null;
+    var userAccepted = false;
+
+    var showUpdate = function (worker) {
+      waitingWorker = worker;
+      updateBanner.hidden = false;
+      document.body.classList.add('has-update');
+    };
+
+    // Acompanha um SW que está instalando; quando termina e já existe um SW
+    // controlando a página, é uma atualização (não a primeira instalação).
+    var track = function (worker) {
+      worker.addEventListener('statechange', function () {
+        if (worker.state === 'installed' && navigator.serviceWorker.controller) {
+          showUpdate(worker);
+        }
+      });
+    };
+
+    var checkForUpdate = function (registration) {
+      registration.update().catch(function () { /* offline: tenta na próxima */ });
+    };
+
+    updateButton.addEventListener('click', function () {
+      if (!waitingWorker) return;
+      userAccepted = true;
+      updateButton.disabled = true;
+      waitingWorker.postMessage('SKIP_WAITING');
+    });
+
+    // Só recarrega se o usuário pediu. Na primeira visita o clients.claim()
+    // também dispara este evento, e aí não pode recarregar.
+    navigator.serviceWorker.addEventListener('controllerchange', function () {
+      if (!userAccepted) return;
+      userAccepted = false;
+      window.location.reload();
+    });
+
     window.addEventListener('load', function () {
-      navigator.serviceWorker.register('./sw.js').catch(function (err) {
+      // updateViaCache 'none': o navegador nunca usa a cópia guardada do sw.js
+      // ao procurar versão nova (o Pages manda max-age=600).
+      navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(function (registration) {
+        // Versão nova que já tinha baixado antes e ficou esperando.
+        if (registration.waiting && navigator.serviceWorker.controller) {
+          showUpdate(registration.waiting);
+        }
+        // Versão nova que está baixando agora.
+        if (registration.installing) track(registration.installing);
+        // Versão nova encontrada depois.
+        registration.addEventListener('updatefound', function () {
+          if (registration.installing) track(registration.installing);
+        });
+        // Procura versão nova ao abrir e sempre que o app volta para a tela
+        // (um app instalado pode ficar aberto por dias).
+        checkForUpdate(registration);
+        document.addEventListener('visibilitychange', function () {
+          if (document.visibilityState === 'visible') checkForUpdate(registration);
+        });
+      }).catch(function (err) {
         // Sem SW (ex.: file://) o app continua funcionando, só não fica offline.
         console.warn('Service worker não registrado:', err);
       });

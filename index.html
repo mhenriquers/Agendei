@@ -17,14 +17,27 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
 
   <link rel="stylesheet" href="./styles.css">
+  <script src="./settings.js" defer></script>
   <script src="./app.js" defer></script>
 </head>
 
 <body>
+  <div id="app-bg" class="app-bg" aria-hidden="true" hidden></div>
+
   <main class="app">
     <header class="app-header">
-      <h1>Olá Thaynara!</h1>
-      <p id="counter" class="counter" aria-live="polite">0 pendentes</p>
+      <img id="avatar" class="avatar" alt="Foto do perfil" width="48" height="48" hidden>
+      <div class="app-title">
+        <h1>Olá Thaynara!</h1>
+        <p id="counter" class="counter" aria-live="polite">0 pendentes</p>
+      </div>
+      <button type="button" id="open-settings" class="icon-btn" aria-haspopup="dialog">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <circle cx="12" cy="12" r="3" />
+          <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z" />
+        </svg>
+        <span class="sr-only">Personalizar</span>
+      </button>
     </header>
 
     <form id="add-form" class="add-form" autocomplete="off">
@@ -46,6 +59,64 @@
       <p class="noscript">Este app precisa de JavaScript ativado para funcionar.</p>
     </noscript>
   </main>
+
+  <div id="update-banner" class="update-banner" role="status" hidden>
+    <span>Nova versão disponível.</span>
+    <button type="button" id="update-button" class="btn btn-primary">Atualizar</button>
+  </div>
+
+  <dialog id="settings" class="settings" aria-labelledby="settings-title">
+    <form method="dialog" class="settings-form">
+      <h2 id="settings-title">Personalizar</h2>
+
+      <fieldset>
+        <legend>Foto do perfil</legend>
+        <p class="hint">Aparece no topo do app e na aba do navegador. O ícone do app instalado não muda: ele é fixo no site.</p>
+        <div class="settings-row">
+          <label class="btn btn-ghost file-btn">
+            Escolher foto
+            <input type="file" id="avatar-file" accept="image/*" class="sr-only">
+          </label>
+          <button type="button" id="avatar-remove" class="btn btn-ghost">Remover</button>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Plano de fundo</legend>
+        <div class="settings-row">
+          <label class="choice"><input type="radio" name="bg-type" value="default"> Padrão</label>
+          <label class="choice"><input type="radio" name="bg-type" value="color"> Cor sólida</label>
+          <label class="choice"><input type="radio" name="bg-type" value="photo"> Foto</label>
+        </div>
+
+        <div id="bg-color-options" class="settings-sub" hidden>
+          <div class="swatches">
+            <button type="button" class="swatch" data-color="#000000" style="background:#000000"><span class="sr-only">Preto</span></button>
+            <button type="button" class="swatch" data-color="#262626" style="background:#262626"><span class="sr-only">Grafite escuro</span></button>
+            <button type="button" class="swatch" data-color="#404040" style="background:#404040"><span class="sr-only">Grafite</span></button>
+            <button type="button" class="swatch" data-color="#737373" style="background:#737373"><span class="sr-only">Cinza</span></button>
+            <button type="button" class="swatch" data-color="#d4d4d4" style="background:#d4d4d4"><span class="sr-only">Cinza claro</span></button>
+            <button type="button" class="swatch" data-color="#ffffff" style="background:#ffffff"><span class="sr-only">Branco</span></button>
+          </div>
+          <label class="color-pick">Outra cor <input type="color" id="bg-color" value="#262626"></label>
+        </div>
+
+        <div id="bg-photo-options" class="settings-sub" hidden>
+          <label class="btn btn-ghost file-btn">
+            Escolher foto
+            <input type="file" id="bg-file" accept="image/*" class="sr-only">
+          </label>
+          <p id="bg-photo-hint" class="hint">Escolha uma foto para usar como fundo.</p>
+          <label for="bg-blur" class="range-label">Desfoque: <output id="bg-blur-value" for="bg-blur">0</output> px</label>
+          <input type="range" id="bg-blur" min="0" max="20" step="1" value="0">
+        </div>
+      </fieldset>
+
+      <div class="settings-actions">
+        <button type="submit" class="btn btn-primary">Fechar</button>
+      </div>
+    </form>
+  </dialog>
 
   <template id="item-template">
     <li class="item">

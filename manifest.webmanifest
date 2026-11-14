@@ -3,7 +3,6 @@
   "short_name": "Agendei",
   "description": "Checklist simples que funciona offline.",
   "lang": "pt-BR",
-  "id": "./",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
@@ -28,6 +27,21 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "./screenshots/wide.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Agendei no computador"
+    },
+    {
+      "src": "./screenshots/narrow.png",
+      "sizes": "540x960",
+      "type": "image/png",
+      "label": "Agendei no celular"
     }
   ]
 }
