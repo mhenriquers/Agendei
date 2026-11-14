@@ -39,7 +39,7 @@ App de checklist (uma única lista) feito como PWA estático e publicado no GitH
 └── README.md
 ```
 
-`logo.jpeg` (foto antiga) e `icons/icon-2.png` (foto atual) são fotos de origem para gerar os ícones. Elas não são usadas pelo app nem entram no cache do SW. A `icon-2.png` fica fora do git.
+`logo.jpeg` (foto antiga) e `icons/icon-2.png` (foto atual) são fotos de origem para gerar os ícones. Elas estão no repo, mas não são usadas pelo app nem entram no cache do SW.
 
 ## Especificação
 
