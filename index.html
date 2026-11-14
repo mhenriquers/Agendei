@@ -40,6 +40,19 @@
       </button>
     </header>
 
+    <div id="due-banner" class="due-banner" role="status" hidden>
+      <button type="button" id="due-banner-open" class="due-banner-open">
+        <span class="due-banner-dot" aria-hidden="true"></span>
+        <span id="due-banner-text">0 tarefas vencem hoje</span>
+      </button>
+      <button type="button" id="due-banner-close" class="icon-btn">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M6 6l12 12M18 6L6 18" />
+        </svg>
+        <span class="sr-only">Fechar aviso</span>
+      </button>
+    </div>
+
     <form id="add-form" class="add-form" autocomplete="off">
       <label for="new-item" class="sr-only">Novo item</label>
       <input id="new-item" name="text" type="text" maxlength="200" required placeholder="O que precisa fazer?"
@@ -114,6 +127,49 @@
 
       <div class="panel-actions">
         <button type="submit" class="btn btn-primary">Fechar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="editor" class="panel" aria-labelledby="editor-title">
+    <form id="editor-form" method="dialog" class="panel-form">
+      <h2 id="editor-title">Editar tarefa</h2>
+
+      <label class="field">
+        Tarefa
+        <input type="text" id="editor-text" maxlength="200" autocomplete="off" enterkeyhint="done">
+      </label>
+
+      <fieldset>
+        <legend>Urgência</legend>
+        <div class="panel-row">
+          <label class="choice"><input type="radio" name="editor-priority" value="low"> Baixa</label>
+          <label class="choice"><input type="radio" name="editor-priority" value="normal"> Normal</label>
+          <label class="choice"><input type="radio" name="editor-priority" value="high"> Alta</label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Prazo</legend>
+        <div class="field-row">
+          <label class="field">
+            Data
+            <input type="date" id="editor-date">
+          </label>
+          <label class="field">
+            Hora (opcional)
+            <input type="time" id="editor-time">
+          </label>
+        </div>
+        <p class="hint">No dia do prazo a tarefa vira urgente e entra no aviso "vence hoje". Hora sem data vale para hoje.</p>
+        <div>
+          <button type="button" id="editor-clear-due" class="btn btn-ghost">Sem prazo</button>
+        </div>
+      </fieldset>
+
+      <div class="panel-actions">
+        <button type="button" id="editor-cancel" class="btn btn-ghost">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Salvar</button>
       </div>
     </form>
   </dialog>

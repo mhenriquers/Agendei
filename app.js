@@ -4,6 +4,9 @@
   // ===== Constantes e storage =====
   var STORAGE_KEY = 'checklist.items.v1';
   var MAX_LENGTH = 200;
+  var PRIORITIES = ['low', 'normal', 'high'];
+  var DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+  var TIME_RE = /^\d{2}:\d{2}$/;
 
   function isValidItem(item) {
     return item !== null &&
@@ -15,6 +18,23 @@
       (item.doneAt === null || typeof item.doneAt === 'number');
   }
 
+  // Normaliza um item já validado. Itens antigos (sem urgência/prazo) ganham
+  // urgência "normal" e prazo vazio; valores inválidos também viram o padrão.
+  function cleanItem(item) {
+    var dueDate = typeof item.dueDate === 'string' && DATE_RE.test(item.dueDate) ? item.dueDate : null;
+    var dueTime = dueDate && typeof item.dueTime === 'string' && TIME_RE.test(item.dueTime) ? item.dueTime : null;
+    return {
+      id: item.id,
+      text: normalize(item.text),
+      done: item.done,
+      createdAt: item.createdAt,
+      doneAt: item.done ? (item.doneAt === null ? item.createdAt : item.doneAt) : null,
+      priority: PRIORITIES.indexOf(item.priority) >= 0 ? item.priority : 'normal',
+      dueDate: dueDate,
+      dueTime: dueTime
+    };
+  }
+
   function load() {
     try {
       var raw = localStorage.getItem(STORAGE_KEY);
@@ -22,15 +42,8 @@
       var data = JSON.parse(raw);
       if (!Array.isArray(data)) return [];
       // Descarta itens malformados em vez de quebrar o app inteiro.
-      return data.filter(isValidItem).map(function (item) {
-        return {
-          id: item.id,
-          text: normalize(item.text),
-          done: item.done,
-          createdAt: item.createdAt,
-          doneAt: item.done ? (item.doneAt === null ? item.createdAt : item.doneAt) : null
-        };
-      }).filter(function (item) { return item.text.length > 0; });
+      return data.filter(isValidItem).map(cleanItem)
+        .filter(function (item) { return item.text.length > 0; });
     } catch (err) {
       return [];
     }
@@ -68,13 +81,81 @@
     render();
   }
 
+  // ===== Datas (sempre no fuso do aparelho) =====
+  var WEEKDAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+
+  function pad(n) {
+    return (n < 10 ? '0' : '') + n;
+  }
+
+  function dateStr(d) {
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  }
+
+  function parseDate(str) {
+    var p = str.split('-');
+    return new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
+  }
+
+  // Momento do prazo. Sem hora, vale até o fim do dia.
+  function dueMoment(item) {
+    var d = parseDate(item.dueDate);
+    var t = (item.dueTime || '23:59').split(':');
+    d.setHours(Number(t[0]), Number(t[1]), 59, 999);
+    return d.getTime();
+  }
+
+  // 'none' | 'late' | 'today' | 'future'
+  function dueState(item, now) {
+    if (!item.dueDate) return 'none';
+    var today = dateStr(now);
+    if (item.dueDate < today) return 'late';
+    if (item.dueDate > today) return 'future';
+    return item.dueTime && now.getTime() > dueMoment(item) ? 'late' : 'today';
+  }
+
+  // "Sex, 21/11" (com o ano quando não é o ano atual).
+  function formatDate(str, now) {
+    var d = parseDate(str);
+    var text = WEEKDAYS[d.getDay()] + ', ' + pad(d.getDate()) + '/' + pad(d.getMonth() + 1);
+    if (d.getFullYear() !== now.getFullYear()) text += '/' + d.getFullYear();
+    return text;
+  }
+
+  // Texto da etiqueta de prazo: no dia, só a hora; em outro dia, só a data.
+  function dueLabel(item, state, now) {
+    if (state === 'today') return item.dueTime || 'Hoje';
+    if (state === 'late') {
+      var when = item.dueDate === dateStr(now) ? item.dueTime : formatDate(item.dueDate, now);
+      return 'Atrasada · ' + when;
+    }
+    return formatDate(item.dueDate, now);
+  }
+
+  // No dia do prazo (ou depois de vencido) a tarefa pendente vira Alta.
+  // A urgência escolhida (item.priority) não é alterada.
+  function effectivePriority(item, now) {
+    if (!item.done) {
+      var state = dueState(item, now);
+      if (state === 'late' || state === 'today') return 'high';
+    }
+    return item.priority;
+  }
+
+  function isDueToday(item, now) {
+    return !item.done && item.dueDate === dateStr(now);
+  }
+
   // ===== Estado e operações =====
   var items = load();
 
   function addItem(text) {
     var clean = normalize(text);
     if (!clean) return false;
-    items.push({ id: newId(), text: clean, done: false, createdAt: Date.now(), doneAt: null });
+    items.push({
+      id: newId(), text: clean, done: false, createdAt: Date.now(), doneAt: null,
+      priority: 'normal', dueDate: null, dueTime: null
+    });
     commit();
     return true;
   }
@@ -87,15 +168,16 @@
     commit();
   }
 
-  function editItem(id, text) {
+  // changes: { text, priority, dueDate, dueTime }. Texto vazio mantém o texto atual.
+  function updateItem(id, changes) {
     var item = findItem(id);
-    var clean = normalize(text);
-    // Texto vazio cancela a edição (não exclui).
-    if (item && clean && clean !== item.text) {
-      item.text = clean;
-      save();
-    }
-    render();
+    if (!item) return;
+    var clean = normalize(changes.text);
+    if (clean) item.text = clean;
+    if (PRIORITIES.indexOf(changes.priority) >= 0) item.priority = changes.priority;
+    item.dueDate = changes.dueDate && DATE_RE.test(changes.dueDate) ? changes.dueDate : null;
+    item.dueTime = item.dueDate && changes.dueTime && TIME_RE.test(changes.dueTime) ? changes.dueTime : null;
+    commit();
   }
 
   function removeItem(id) {
@@ -108,9 +190,21 @@
     commit();
   }
 
-  function sortedItems() {
+  var RANK = { high: 0, normal: 1, low: 2 };
+
+  // Pendentes: urgência efetiva (Alta → Normal → Baixa), depois prazo mais
+  // próximo (atrasadas primeiro, sem prazo por último), depois o mais novo.
+  // Concluídos embaixo, mais recentemente concluídos primeiro.
+  function sortedItems(now) {
     var pending = items.filter(function (i) { return !i.done; })
-      .sort(function (a, b) { return b.createdAt - a.createdAt; });
+      .sort(function (a, b) {
+        var r = RANK[effectivePriority(a, now)] - RANK[effectivePriority(b, now)];
+        if (r !== 0) return r;
+        var da = a.dueDate ? dueMoment(a) : Infinity;
+        var db = b.dueDate ? dueMoment(b) : Infinity;
+        if (da !== db) return da < db ? -1 : 1;
+        return b.createdAt - a.createdAt;
+      });
     var done = items.filter(function (i) { return i.done; })
       .sort(function (a, b) { return b.doneAt - a.doneAt; });
     return pending.concat(done);
@@ -124,31 +218,79 @@
   var counter = document.getElementById('counter');
   var emptyState = document.getElementById('empty-state');
   var clearBtn = document.getElementById('clear-done');
+  var dueBanner = document.getElementById('due-banner');
+  var dueBannerOpen = document.getElementById('due-banner-open');
+  var dueBannerText = document.getElementById('due-banner-text');
+  var dueBannerClose = document.getElementById('due-banner-close');
 
-  var editingId = null;
   // Item que acabou de ser concluído: ganha a classe .just-done (pulo do check) no próximo render.
   var justDoneId = null;
+  // O usuário fechou o aviso "vence hoje": some até o app abrir ou voltar para a tela.
+  var dueDismissed = false;
+  // Resumo do que depende do relógio; quando muda, a lista é redesenhada.
+  var lastClockSignature = '';
+
+  function makeTag(className, text, srPrefix) {
+    var tag = document.createElement('span');
+    tag.className = 'tag ' + className;
+    if (srPrefix) {
+      var sr = document.createElement('span');
+      sr.className = 'sr-only';
+      sr.textContent = srPrefix;
+      tag.appendChild(sr);
+    }
+    tag.appendChild(document.createTextNode(text));
+    return tag;
+  }
+
+  function clockSignature(now) {
+    return dateStr(now) + '|' + items.map(function (i) {
+      return i.id + ':' + (i.done ? 'd' : dueState(i, now));
+    }).join(',');
+  }
+
+  // Guarda qual controle de qual item tinha o foco, para devolvê-lo depois do render.
+  function focusedControl() {
+    var el = document.activeElement;
+    if (!el || !list.contains(el)) return null;
+    var li = el.closest('.item');
+    var kind = ['item-toggle', 'item-edit', 'item-delete'].filter(function (c) { return el.classList.contains(c); })[0];
+    return li && kind ? { id: li.dataset.id, kind: kind } : null;
+  }
 
   function render() {
-    editingId = null;
+    var now = new Date();
     var popId = justDoneId;
     justDoneId = null;
+    var keepFocus = focusedControl();
     list.textContent = '';
 
-    var sorted = sortedItems();
     var fragment = document.createDocumentFragment();
 
-    sorted.forEach(function (item) {
+    sortedItems(now).forEach(function (item) {
       var li = template.content.firstElementChild.cloneNode(true);
       li.dataset.id = item.id;
       li.classList.toggle('done', item.done);
       if (item.id === popId) li.classList.add('just-done');
 
+      var effective = effectivePriority(item, now);
+      if (effective !== 'normal') li.classList.add('prio-' + effective);
+
       var checkbox = li.querySelector('.item-toggle');
       checkbox.checked = item.done;
 
-      var textEl = li.querySelector('.item-text');
-      textEl.textContent = item.text;
+      li.querySelector('.item-text').textContent = item.text;
+
+      // Etiquetas: urgência escolhida (Alta/Baixa) e prazo.
+      var meta = li.querySelector('.item-meta');
+      if (item.priority === 'high') meta.appendChild(makeTag('tag-high', 'Alta', 'Urgência: '));
+      if (item.priority === 'low') meta.appendChild(makeTag('tag-low', 'Baixa', 'Urgência: '));
+      if (item.dueDate) {
+        var state = dueState(item, now);
+        var cls = item.done ? 'tag-due' : (state === 'late' ? 'tag-late' : state === 'today' ? 'tag-today' : 'tag-due');
+        meta.appendChild(makeTag(cls, dueLabel(item, state, now), 'Prazo: '));
+      }
+      meta.hidden = meta.childNodes.length === 0;
 
       var label = 'Marcar "' + item.text + '" como ' + (item.done ? 'pendente' : 'concluído');
       checkbox.setAttribute('aria-label', label);
@@ -160,6 +302,11 @@
 
     list.appendChild(fragment);
 
+    if (keepFocus) {
+      var again = list.querySelector('[data-id="' + cssEscape(keepFocus.id) + '"] .' + keepFocus.kind);
+      if (again) again.focus();
+    }
+
     var pendingCount = items.filter(function (i) { return !i.done; }).length;
     var doneCount = items.length - pendingCount;
 
@@ -167,52 +314,80 @@
     emptyState.hidden = items.length > 0;
     list.hidden = items.length === 0;
     clearBtn.disabled = doneCount === 0;
+
+    // Aviso "vence hoje": só tarefas pendentes com prazo para hoje.
+    var todayCount = items.filter(function (i) { return isDueToday(i, now); }).length;
+    dueBannerText.textContent = todayCount === 1 ? '1 tarefa vence hoje' : todayCount + ' tarefas vencem hoje';
+    dueBanner.hidden = todayCount === 0 || dueDismissed;
+
+    lastClockSignature = clockSignature(now);
   }
 
-  // ===== Edição inline =====
-  function startEdit(li) {
-    var id = li.dataset.id;
+  // ===== Painel "Editar tarefa" =====
+  var editor = document.getElementById('editor');
+  var editorForm = document.getElementById('editor-form');
+  var editorText = document.getElementById('editor-text');
+  var editorDate = document.getElementById('editor-date');
+  var editorTime = document.getElementById('editor-time');
+  var editorClearDue = document.getElementById('editor-clear-due');
+  var editorCancel = document.getElementById('editor-cancel');
+  var editingId = null;
+
+  function openEditor(id) {
     var item = findItem(id);
-    if (!item || editingId) return;
+    if (!item) return;
     editingId = id;
-
-    var field = document.createElement('input');
-    field.type = 'text';
-    field.className = 'edit-input';
-    field.maxLength = MAX_LENGTH;
-    field.value = item.text;
-    field.setAttribute('aria-label', 'Editar item');
-    field.setAttribute('enterkeyhint', 'done');
-
-    var finished = false;
-    function finish(saveIt) {
-      if (finished) return;
-      finished = true;
-      if (saveIt) {
-        editItem(id, field.value);
-      } else {
-        render();
-      }
-      var row = list.querySelector('[data-id="' + cssEscape(id) + '"] .item-edit');
-      if (row) row.focus();
-    }
-
-    field.addEventListener('keydown', function (event) {
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        finish(true);
-      } else if (event.key === 'Escape') {
-        event.preventDefault();
-        finish(false);
-      }
+    editorText.value = item.text;
+    editorForm.querySelectorAll('input[name="editor-priority"]').forEach(function (radio) {
+      radio.checked = radio.value === item.priority;
     });
-    field.addEventListener('blur', function () { finish(true); });
-
-    li.classList.add('editing');
-    li.insertBefore(field, li.firstChild);
-    field.focus();
-    field.setSelectionRange(field.value.length, field.value.length);
+    editorDate.value = item.dueDate || '';
+    editorTime.value = item.dueTime || '';
+    if (typeof editor.showModal === 'function') {
+      editor.showModal();
+    } else {
+      editor.setAttribute('open', '');
+    }
+    editorText.focus();
+    editorText.setSelectionRange(editorText.value.length, editorText.value.length);
   }
+
+  function closeEditor() {
+    var id = editingId;
+    editingId = null;
+    if (editor.open) editor.close();
+    var btn = id && list.querySelector('[data-id="' + cssEscape(id) + '"] .item-edit');
+    if (btn) btn.focus();
+  }
+
+  editorForm.addEventListener('submit', function (event) {
+    event.preventDefault();
+    if (!editingId) return;
+    var checked = editorForm.querySelector('input[name="editor-priority"]:checked');
+    var date = editorDate.value;
+    // Hora sem data: vale para hoje.
+    if (!date && editorTime.value) date = dateStr(new Date());
+    updateItem(editingId, {
+      text: editorText.value,
+      priority: checked ? checked.value : 'normal',
+      dueDate: date,
+      dueTime: editorTime.value
+    });
+    closeEditor();
+  });
+
+  editorCancel.addEventListener('click', closeEditor);
+
+  // Esc fecha o <dialog> sozinho; aqui só devolvemos o foco.
+  editor.addEventListener('close', function () {
+    if (editingId) closeEditor();
+  });
+
+  editorClearDue.addEventListener('click', function () {
+    editorDate.value = '';
+    editorTime.value = '';
+    editorDate.focus();
+  });
 
   // ===== Fogos de artifício ao concluir =====
   // Três explosões pequenas (raio próximo ao tamanho da caixa de check), em
@@ -291,7 +466,7 @@
     if (!li) return;
 
     if (button.dataset.action === 'edit') {
-      startEdit(li);
+      openEditor(li.dataset.id);
     } else if (button.dataset.action === 'delete') {
       var next = li.nextElementSibling || li.previousElementSibling;
       var nextId = next ? next.dataset.id : null;
@@ -313,6 +488,40 @@
       input.focus();
     }
   });
+
+  // Aviso "vence hoje": leva até a primeira tarefa do dia.
+  dueBannerOpen.addEventListener('click', function () {
+    var now = new Date();
+    var first = sortedItems(now).filter(function (i) { return isDueToday(i, now); })[0];
+    var li = first && list.querySelector('[data-id="' + cssEscape(first.id) + '"]');
+    if (!li) return;
+    li.scrollIntoView({ block: 'center', behavior: reduceMotion && reduceMotion.matches ? 'auto' : 'smooth' });
+    li.classList.remove('flash');
+    void li.offsetWidth; // reinicia a animação
+    li.classList.add('flash');
+    li.querySelector('.item-toggle').focus({ preventScroll: true });
+  });
+
+  dueBannerClose.addEventListener('click', function () {
+    dueDismissed = true;
+    dueBanner.hidden = true;
+    input.focus();
+  });
+
+  // Voltou para o app: o aviso aparece de novo e os prazos são recalculados.
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'visible') {
+      dueDismissed = false;
+      render();
+    }
+  });
+
+  // Com o app aberto, a virada do dia ou a hora do prazo passando mudam
+  // etiquetas, urgência e ordem. Só redesenha quando algo mudou.
+  setInterval(function () {
+    if (editingId) return;
+    if (clockSignature(new Date()) !== lastClockSignature) render();
+  }, 30000);
 
   // Sincronização entre abas.
   window.addEventListener('storage', function (event) {

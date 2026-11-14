@@ -418,23 +418,6 @@ output {
   display: flex;
 }
 
-/* Edição por linha (substituída pelo painel "Editar tarefa" na funcionalidade de prazo). */
-.item.editing .item-check,
-.item.editing .item-actions {
-  display: none;
-}
-
-.edit-input {
-  flex: 1;
-  min-width: 0;
-  min-height: var(--tap);
-  margin: var(--space-1) 0;
-  padding: 0 var(--space-3);
-  background: var(--surface);
-  border: 1px solid var(--field-border);
-  border-radius: var(--radius);
-}
-
 /* "Pulo" do check no item que acabou de ser concluído. */
 .item.just-done .item-toggle {
   animation: check-pop 320ms ease-out;

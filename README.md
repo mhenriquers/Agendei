@@ -5,6 +5,7 @@
 Checklist simples que funciona offline e pode ser instalado no celular ou no computador (PWA).
 
 - Adicionar, marcar como feito, editar e excluir itens
+- Urgência (Baixa, Normal, Alta) e prazo com data e hora; no dia do prazo a tarefa vira urgente e aparece o aviso "vence hoje"
 - "Limpar concluídos" remove de uma vez todos os itens feitos
 - Os dados ficam salvos no próprio navegador (`localStorage`, chaves `checklist.items.v1` e `checklist.settings.v1`); não há conta nem servidor
 - Funciona sem internet depois do primeiro acesso

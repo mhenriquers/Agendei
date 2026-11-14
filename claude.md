@@ -53,15 +53,16 @@ App de checklist (uma única lista) feito como PWA estático e publicado no GitH
 ## Especificação
 
 1. **Nome do repo e do app**: `Agendei`. `start_url: "./"` e `scope: "./"`, sem `id` no manifest (ver "Notas técnicas"), então o manifest funciona com qualquer nome de repo.
-2. **Funcionalidades**: adicionar item, marcar/desmarcar como feito (com fogos de artifício ao concluir), editar texto, excluir item, limpar concluídos, contador de pendentes, estado vazio. Uma única lista. Painel Personalizar (foto do perfil e plano de fundo). Aviso de nova versão.
+2. **Funcionalidades**: adicionar item, marcar/desmarcar como feito (com fogos de artifício ao concluir), editar (texto, urgência e prazo), excluir item, limpar concluídos, contador de pendentes, estado vazio, aviso "vence hoje". Uma única lista. Painel Personalizar (foto do perfil e plano de fundo). Aviso de nova versão.
 3. **Regras de negócio**:
    - Texto obrigatório após `trim()`; espaços internos repetidos viram um só.
    - Máximo de 200 caracteres (`maxlength` no input + corte no JS).
    - Itens duplicados são permitidos.
-   - Ordem: pendentes primeiro (mais novos no topo), concluídos depois (mais recentemente concluídos no topo).
+   - Adicionar é só o texto (urgência Normal, sem prazo); urgência e prazo são definidos no painel "Editar tarefa".
+   - Ordem: ver "Urgência e prazo".
    - Excluir um item é direto, sem confirmação. "Limpar concluídos" pede `confirm()` porque apaga vários.
-   - Editar para texto vazio cancela a edição (não exclui).
-4. **Modelo do item**: `{ id: string, text: string, done: boolean, createdAt: number, doneAt: number | null }`. No storage, salvo como array JSON em `checklist.items.v1`. O `load()` valida cada item e descarta campos desconhecidos: ao acrescentar campos novos, atualize a validação e o mapeamento, e trate itens antigos sem o campo.
+   - Na edição, texto vazio mantém o texto anterior (não exclui).
+4. **Modelo do item**: `{ id: string, text: string, done: boolean, createdAt: number, doneAt: number | null, priority: "low" | "normal" | "high", dueDate: "AAAA-MM-DD" | null, dueTime: "HH:MM" | null }`. No storage, salvo como array JSON em `checklist.items.v1`. Datas e horas são do fuso do aparelho. `dueTime` só existe com `dueDate`. O `load()` valida cada item e descarta campos desconhecidos (`cleanItem` em `app.js`): itens antigos sem `priority`/`dueDate`/`dueTime`, ou com valores inválidos, ficam Normal e sem prazo. Ao acrescentar campos novos, atualize a validação e o mapeamento.
 5. **Modelo das preferências**: `{ bgType: "default" | "color" | "photo", bgColor: "#rrggbb", bgPhoto: dataURL | null, bgBlur: 0–20, avatar: dataURL | null }`, salvo como JSON em `checklist.settings.v1`. Valor inválido ou corrompido volta para o padrão.
 6. **Idioma**: português (pt-BR).
 7. **Visual — paleta "Areia e coral"** (escolhida pelo usuário depois de achar o preto e branco "sem graça"): tema único e claro, sem variação claro/escuro do sistema. Tokens em `:root` no `styles.css`:
@@ -70,6 +71,19 @@ App de checklist (uma única lista) feito como PWA estático e publicado no GitH
    - urgência alta `#d6564b` (etiqueta `#fbe3df`/`#a63a31`), "Atrasada" `#b23b30` com texto branco, urgência baixa `#7fb3cf` (etiqueta `#e3f0f7`/`#356a86`).
    - O `theme_color`, o `background_color` do manifest e o `meta theme-color` são `#fbf6ee`. O contorno de foco é escuro (`#3d3431`) com um anel branco por dentro, para aparecer em qualquer fundo.
 8. **Concluir item**: o check marcado é verde (`--check: #2f7d57`, escuro o bastante para o navegador desenhar o ✓ branco). Ao marcar (clique ou Espaço), saem fogos de artifício pequenos do ponto onde estava o check: 3 explosões seguidas (0, 140 e 280 ms), cada uma com um clarão amarelo-manteiga e 10 faíscas coloridas (verde, mostarda, rosa, azul, coral e lilás; nada de branco, que some no fundo claro) com raio de 12–17 px (perto do tamanho da caixa de 22 px). Elas ficam em posição fixa na tela porque o item concluído desce na lista logo em seguida; lá, o check dá um "pulo" (classe `.just-done`). Desmarcar não solta fogos, e com `prefers-reduced-motion` não há fogos.
+
+## Urgência e prazo
+
+Decidido com o usuário (as decisões marcadas com * foram tomadas sem perguntar, a pedido dele, e podem ser revistas):
+
+- **Urgência:** 3 níveis, Baixa, Normal (padrão) e Alta. No card: faixa colorida na lateral (Alta coral-vermelho, Baixa azul; Normal sem faixa) e etiqueta "Alta"/"Baixa" quando é a urgência escolhida.
+- **Prazo:** data e hora; a hora é opcional*. Sem hora, o prazo vale até o fim do dia. Hora sem data vale para hoje*.
+- **Etiqueta de prazo:** se o prazo é **hoje**, mostra só a hora ("14:30", ou "Hoje" sem hora); se é **outro dia**, mostra só a data ("Sex, 21/11", com o ano quando não é o ano atual)*; vencido mostra "Atrasada · 14:30" (hoje) ou "Atrasada · Ter, 17/11" (dia anterior), em vermelho. Item concluído mostra a etiqueta neutra.
+- **Urgência efetiva:** pendente com prazo hoje ou vencido vira **Alta** automaticamente (faixa e ordem). A urgência escolhida (`priority`) não muda: se o prazo for para outro dia, o card volta a ela.
+- **Ordem dos pendentes:** urgência efetiva (Alta → Normal → Baixa); no mesmo nível, prazo mais próximo primeiro (atrasadas no topo), sem prazo por último; empate pelo mais novo. Concluídos embaixo, mais recentemente concluídos primeiro. "Filtrar por urgência" é só essa ordem; não há botões de filtro*.
+- **Aviso "vence hoje":** faixa amarela abaixo do cabeçalho com "N tarefas vencem hoje", contando só pendentes com prazo para hoje (vencidas de dias anteriores não contam). Tocar leva até a primeira delas (rola, destaca o card e foca o check); o "×" esconde até o app abrir ou voltar para a tela (`visibilitychange`). Sem servidor, não há aviso com o app fechado; sem número no ícone (descartado pelo usuário).
+- **Relógio com o app aberto:** a cada 30 s o app compara um resumo dos estados de prazo (`clockSignature`) e só redesenha a lista se algo mudou (virada do dia, hora do prazo passando). O render devolve o foco ao mesmo controle; com o painel de edição aberto, espera.
+- **Painel "Editar tarefa"** (lápis do card; `<dialog id="editor">`): texto, urgência (rádios), data, hora e botão "Sem prazo". Enter no texto salva, Esc ou "Cancelar" fecham sem salvar, e o foco volta ao lápis do card.
 
 ## Painel Personalizar (`settings.js`)
 
