@@ -2,6 +2,6 @@
 
 Contexto, regras e especificação estão no `claude.md`.
 
-## R — Revisar com o usuário
+eu quero que o bob esponja apareça no canto esquerdo, e não no meio
 
-- [ ] **R1** Confirmar as decisões de "Urgência e prazo" tomadas sem perguntar (marcadas com * no `claude.md`): hora opcional, hora sem data vale para hoje, outro dia mostra só a data, sem botões de filtro por urgência.
+quero que o plano de fundo padrão seja a foto logo.jpeg
