@@ -40,7 +40,7 @@ Contexto, regras e especificação estão no `claude.md`.
   ```
 
 - [ ] **T1.1.3** **Não mexer** nos eventos `activate` (continua apagando caches antigos e chamando `self.clients.claim()`) e `fetch`.
-- [ ] **T1.1.4** Incrementar `CACHE_NAME` (ex.: `checklist-v3` → `checklist-v4`). A lista `ASSETS` não muda: nenhum arquivo novo é criado nesta tarefa.
+- [ ] **T1.1.4** Incrementar `CACHE_NAME` (ex.: `checklist-v4` → `checklist-v5`). A lista `ASSETS` não muda: nenhum arquivo novo é criado nesta tarefa.
 - [ ] **T1.1.5** No comentário do topo do `sw.js`, acrescentar uma linha: "O SW novo fica em espera até o usuário tocar em Atualizar (ver app.js)."
 
 ### T1.2 — `index.html`
@@ -165,22 +165,22 @@ Contexto, regras e especificação estão no `claude.md`.
 
 Servir pela pasta pai para simular o Pages: em `c:/dev`, rodar `npx --yes http-server -c-1 -p 8000` e abrir `http://localhost:8000/Agendei/`. Manter o DevTools aberto em **Aplicativo → Service workers**.
 
-- [ ] **T1.5.1** **Primeira visita:** em Aplicativo → Armazenamento, clicar em "Limpar dados do site" e recarregar. Esperado: a página carrega **uma vez só** (sem recarregar sozinha), a faixa **não** aparece, e o SW `checklist-v4` fica "ativado e em execução".
-- [ ] **T1.5.2** **Simular versão nova:** sem fechar a aba, mudar temporariamente o `<h1>` do `index.html` (ex.: acrescentar " (teste)") e o `CACHE_NAME` para `checklist-v5`. Voltar para a aba e recarregar (F5). Esperado: a página ainda mostra o título antigo, a faixa "Nova versão disponível." aparece, e em Service workers há um SW novo "aguardando ativação".
-- [ ] **T1.5.3** **Atualizar:** clicar em **Atualizar**. Esperado: a página recarrega **uma vez**, mostra o título com " (teste)", a faixa some, e só existe um SW ativo (nenhum aguardando). Em **Armazenamento em cache**, existe só `checklist-v5`.
-- [ ] **T1.5.4** **Verificação ao voltar para a tela:** mudar o `CACHE_NAME` para `checklist-v6`, ir para outra aba e voltar (sem F5). Esperado: a faixa aparece sozinha em poucos segundos.
+- [ ] **T1.5.1** **Primeira visita:** em Aplicativo → Armazenamento, clicar em "Limpar dados do site" e recarregar. Esperado: a página carrega **uma vez só** (sem recarregar sozinha), a faixa **não** aparece, e o SW `checklist-v5` fica "ativado e em execução".
+- [ ] **T1.5.2** **Simular versão nova:** sem fechar a aba, mudar temporariamente o `<h1>` do `index.html` (ex.: acrescentar " (teste)") e o `CACHE_NAME` para `checklist-v6`. Voltar para a aba e recarregar (F5). Esperado: a página ainda mostra o título antigo, a faixa "Nova versão disponível." aparece, e em Service workers há um SW novo "aguardando ativação".
+- [ ] **T1.5.3** **Atualizar:** clicar em **Atualizar**. Esperado: a página recarrega **uma vez**, mostra o título com " (teste)", a faixa some, e só existe um SW ativo (nenhum aguardando). Em **Armazenamento em cache**, existe só `checklist-v6`.
+- [ ] **T1.5.4** **Verificação ao voltar para a tela:** mudar o `CACHE_NAME` para `checklist-v7`, ir para outra aba e voltar (sem F5). Esperado: a faixa aparece sozinha em poucos segundos.
 - [ ] **T1.5.5** **Offline:** no DevTools, aba Rede → "Offline". Ir para outra aba e voltar. Esperado: o app continua funcionando e o console não mostra erro "Uncaught" vindo do `app.js`.
-- [ ] **T1.5.6** **Faixa no celular (360px):** no modo dispositivo do DevTools, com a faixa visível, rolar até o fim: o botão "Limpar concluídos" fica acima da faixa, sem ficar coberto, e não há scroll horizontal. Conferir também no tema escuro.
+- [ ] **T1.5.6** **Faixa no celular (360px):** no modo dispositivo do DevTools, com a faixa visível, rolar até o fim: o botão "Limpar concluídos" fica acima da faixa, sem ficar coberto, e não há scroll horizontal.
 - [ ] **T1.5.7** **Teclado:** com a faixa visível, chegar ao botão **Atualizar** com Tab (contorno visível) e acionar com Enter.
-- [ ] **T1.5.8** **Desfazer o teste:** tirar o " (teste)" do `<h1>` e voltar o `CACHE_NAME` para `checklist-v4`. Conferir com `git diff index.html` que o único trecho mudado no `index.html` é a faixa do T1.2.
+- [ ] **T1.5.8** **Desfazer o teste:** tirar o " (teste)" do `<h1>` e voltar o `CACHE_NAME` para `checklist-v5`. Conferir com `git diff index.html` que o único trecho mudado no `index.html` é a faixa do T1.2.
 
 ### T1.6 — Documentar e publicar
 
 - [ ] **T1.6.1** No `claude.md`, em "Notas técnicas", trocar a nota **Atualização** por: "O SW novo instala em segundo plano e espera. O app mostra a faixa 'Nova versão disponível' e só troca de versão quando o usuário toca em Atualizar. A mudança só é detectada se o `CACHE_NAME` (ou qualquer byte do `sw.js`) mudar."
 - [ ] **T1.6.2** No `README.md`, na seção "Atualizar o app depois de publicado", trocar o último parágrafo por: "Na próxima vez que alguém abrir o app (ou voltar para ele), aparece a faixa 'Nova versão disponível'. Tocando em Atualizar, o app recarrega na versão nova."
 - [ ] **T1.6.3** Commit com `sw.js`, `index.html`, `styles.css`, `app.js`, `claude.md`, `README.md` e `task.md`, e push na `main`.
-- [ ] **T1.6.4** **Transição (só desta vez):** quem já tem o app instalado está com o SW `checklist-v3`, que não conhece a faixa. O `checklist-v4` vai ficar esperando até o app ser **fechado por completo** (no celular, também tirar dos apps recentes) e aberto de novo. Depois disso, as próximas atualizações já mostram a faixa.
-- [ ] **T1.6.5** **Teste real:** após o push, abrir https://mhenriquers.github.io/Agendei/ e confirmar no DevTools que o SW ativo é o `checklist-v4`. A primeira atualização publicada depois disso (ex.: o T2) serve de teste de verdade da faixa no PC e no celular.
+- [ ] **T1.6.4** **Transição (só desta vez):** quem já tem o app instalado está com o SW `checklist-v4`, que não conhece a faixa. O `checklist-v5` vai ficar esperando até o app ser **fechado por completo** (no celular, também tirar dos apps recentes) e aberto de novo. Depois disso, as próximas atualizações já mostram a faixa.
+- [ ] **T1.6.5** **Teste real:** após o push, abrir https://mhenriquers.github.io/Agendei/ e confirmar no DevTools que o SW ativo é o `checklist-v5`. A primeira atualização publicada depois disso (ex.: o T2) serve de teste de verdade da faixa no PC e no celular.
 
 ## Demais tarefas
 

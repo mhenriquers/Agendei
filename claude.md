@@ -23,7 +23,7 @@ App de checklist (uma única lista) feito como PWA estático e publicado no GitH
 ```
 /
 ├── index.html             estrutura da página
-├── styles.css             visual (claro/escuro, responsivo)
+├── styles.css             visual (monocromático escuro, responsivo)
 ├── app.js                 estado, renderização, eventos e persistência
 ├── manifest.webmanifest   dados de instalação do PWA
 ├── sw.js                  service worker (cache offline)
@@ -50,7 +50,7 @@ App de checklist (uma única lista) feito como PWA estático e publicado no GitH
    - Editar para texto vazio cancela a edição (não exclui).
 4. **Modelo do item**: `{ id: string, text: string, done: boolean, createdAt: number, doneAt: number | null }`. No storage, salvo como array JSON em `checklist.items.v1`.
 5. **Idioma**: português (pt-BR).
-6. **Visual**: fonte de sistema, cor de destaque verde-azulada `#0f766e`, fundo claro `#f8fafc` / escuro `#0f172a`. Esse verde é o `theme_color` do manifest.
+6. **Visual**: tema único, monocromático (preto e branco), sem variação claro/escuro. Fundo `#262626` (um pouco mais escuro que grafite), superfícies `#333333`, texto e botão principal `#f5f5f5`, texto secundário `#a3a3a3`, bordas `#737373`. O `theme_color` e o `background_color` do manifest e o `meta theme-color` são `#262626`.
 
 ## Ícones
 
