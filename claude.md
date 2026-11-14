@@ -46,7 +46,7 @@ App de checklist (uma única lista) feito como PWA estático e publicado no GitH
 │   ├── avatar-1.png       foto de perfil pronta (preto e branco, de logo.jpeg)
 │   └── avatar-2.png       foto de perfil pronta (colorida, de icons/icon-2.png)
 ├── img/
-│   ├── bob.webp           Bob Esponja acenando, animado e com fundo transparente (347×320, 51 quadros)
+│   ├── bob.webp           Bob Esponja acenando, animado e com fundo transparente (354×360, 51 quadros, 24 por segundo)
 │   └── bob-parado.png     primeiro quadro, para quem pede movimento reduzido
 ├── screenshots/
 │   ├── wide.png           captura de PC (1280×800) para a janela de instalação
@@ -57,7 +57,7 @@ App de checklist (uma única lista) feito como PWA estático e publicado no GitH
 
 Arquivos de origem (não usados pelo app nem cacheados pelo SW):
 - `logo.jpeg` (foto antiga, preto e branco) e `icons/icon-2.png` (foto atual, colorida): fotos para gerar ícones e fotos de perfil. Estão no repo.
-- `icons/bob.mp4` (origem do `img/bob.webp`) e `img/bob-2.mp4` (outro vídeo do Bob enviado pelo usuário, uso ainda não definido): ficam **fora do git**.
+- `img/bob-2.mp4` (origem do `img/bob.webp` atual) e `icons/bob.mp4` (primeiro vídeo do Bob, trocado porque o usuário não gostou do resultado): ficam **fora do git**.
 
 ## Especificação
 
@@ -98,11 +98,14 @@ Decidido com o usuário (as decisões marcadas com * foram tomadas sem perguntar
 
 - Ao abrir o app (evento `load`) e sempre que a pessoa volta para ele (`visibilitychange`), depois de 0,5 s, o Bob sobe do canto inferior direito acenando, com o balão **"O que faremos hoje?"** à direita dele (a pontinha do balão aponta para o Bob, à esquerda; antes ficava do outro lado e o usuário pediu para trocar). Tocar no Bob ou no balão foca o campo "O que precisa fazer?" e ele sai. Ele também sai sozinho depois de 8 s ou quando o campo ganha foco. Não aparece se houver um painel aberto (`dialog[open]`) ou se o campo estiver com foco, e não reinicia a animação se ainda estiver na tela.
 - O contêiner `#bob` tem `pointer-events: none` (só o Bob e o balão recebem toque), e com a faixa de atualização aberta (`body.has-update`) ele sobe para ficar acima dela. Com `prefers-reduced-motion`, o `<picture>` troca a animação por `img/bob-parado.png`.
-- **Origem da imagem** (o mesmo processo serve para outros vídeos de fundo liso): o usuário forneceu `icons/bob.mp4` (1280×720, 3,4 s, fundo branco com faixas pretas). Como MP4 não tem transparência e WebM com transparência não funciona no iPhone, o vídeo virou **WebP animado com alfa** (funciona em Chrome, Edge, Android e Safari 14+), gerado por um script Node que dirige o Edge (sem ffmpeg nesta máquina), guardado fora do repo:
-  - recorte: caixa calculada com todos os quadros (30 por segundo) + margem, reduzido para 320 px de altura, 15 quadros por segundo;
-  - fundo: branco quase puro e neutro ligado à borda do quadro vira transparente, com contorno suave (alfa pela "brancura" e cor descontaminada do branco, sem auréola);
-  - buracos: região branca **fechada** que é fundo em ≥ 50% dos outros quadros, com ≥ 150 px e cor média ≥ 249 também vira transparente (é o vão entre o braço e a cabeça, e entre o braço na cintura e o corpo). Olhos, dentes e camisa nunca são fundo; a manga, que muda de lugar, é pequena e sombreada. Limites tirados da medição de todas as regiões fechadas dos 51 quadros;
-  - montagem: cada quadro sai do canvas como WebP e é empacotado num RIFF com `VP8X` (alfa + animação), `ANIM` (repetição infinita) e um `ANMF` por quadro (67 ms).
+- **Origem da imagem** (o mesmo processo serve para outros vídeos de fundo liso): `img/bob-2.mp4` (1280×720, 2,1 s, 24 quadros por segundo, fundo branco com faixas pretas em cima e embaixo). O primeiro vídeo (`icons/bob.mp4`) foi trocado por este a pedido do usuário. Como MP4 não tem transparência e WebM com transparência não funciona no iPhone, o vídeo virou **WebP animado com alfa** (funciona em Chrome, Edge, Android e Safari 14+), gerado por um script Node que dirige o Edge (sem ffmpeg nesta máquina), guardado fora do repo:
+  - quadros: os 51 do vídeo (24 por segundo, nenhum descartado, para o aceno ficar suave), cada um pego no meio do seu tempo; o último emenda com o primeiro, então o loop não pula;
+  - recorte: caixa com o Bob em todos os quadros + 8 px de margem, reduzida para 360 px de altura (140 px na tela × 3 de densidade no celular);
+  - fundo: pixel quase branco e neutro (mínimo de RGB ≥ 225, diferença entre canais ≤ 24) ligado à borda vira transparente. Na faixa de 2 px entre o fundo e o Bob, o alfa sai por "cor para alfa" (o menor alfa que explica a cor como mistura com branco, com a cor descontaminada do branco e 4% de folga para o ruído de compressão), então o contorno fica suave e sem auréola branca em fundo escuro;
+  - buracos (regiões brancas **fechadas**): o vão entre o braço que acena e a cabeça é reconhecido porque, em outros quadros, aqueles pixels são fundo ligado à borda (≥ 30% da região é fundo em ≥ 3 quadros); o vão entre o braço na cintura e o corpo nunca se abre (o braço não se mexe), então é marcado por um ponto fixo (776, 478). Olhos, dentes, camisa, mangas, meias e brilho do sapato nunca são fundo em quadro nenhum e ficam opacos;
+  - entre os dedos: o borrão de movimento deixa pixels cinza-claro que não passam no teste de branco. Só na área por onde a mão passa (fundo em ≥ 3 outros quadros), pixel claro e sem cor (mínimo ≥ 150, diferença ≤ 50) também vira fundo; o amarelo da mão tem muita cor e não é afetado. Os triângulos cinza-escuro embaixo dos sapatos são sombra do desenho e ficam;
+  - montagem: cada quadro sai do canvas como WebP (qualidade 0,85) e é empacotado num RIFF com `VP8X` (alfa + animação), `ANIM` (repetição infinita) e um `ANMF` por quadro (41–42 ms, sem mistura com o quadro anterior). Resultado: cerca de 1,2 MB. `img/bob-parado.png` é o primeiro quadro;
+  - conferência: imagens de diagnóstico (fundo e buracos pintados) e o recorte ampliado sobre fundo escuro, procurando lascas e auréolas; `ImageDecoder` confirma animação, 51 quadros e repetição infinita.
 
 ## Painel Personalizar (`settings.js`)
 
