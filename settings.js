@@ -2,12 +2,15 @@
 
 /*
  * Personalização: foto do perfil (avatar no topo + ícone da aba) e plano de fundo
- * (padrão, cor sólida ou foto com desfoque). Salvo em localStorage, chave
+ * (padrão = foto fixa do app, cor sólida ou foto enviada; as fotos aceitam desfoque). Salvo em localStorage, chave
  * checklist.settings.v1. O ícone do app instalado NÃO muda: ele vem do manifest.
  */
 (function () {
   var SETTINGS_KEY = 'checklist.settings.v1';
-  var DEFAULT_BG = '#fbf6ee';
+  var DEFAULT_BG = '#fbf6ee'; // cor por baixo da foto (enquanto carrega) e cor sólida inicial
+  // Fundo padrão: foto fixa no repo (cacheada pelo SW), com o rosto mais para cima.
+  var DEFAULT_PHOTO = './img/fundo-padrao.jpg';
+  var DEFAULT_PHOTO_POSITION = '45% 30%';
   var PHOTO_THEME = '#3d3431'; // cor da barra do sistema com foto de fundo (escurecida)
   var MAX_BLUR = 20;
 
@@ -71,6 +74,7 @@
   var colorInput = document.getElementById('bg-color');
   var swatches = document.querySelectorAll('.swatch');
   var bgFile = document.getElementById('bg-file');
+  var blurOptions = document.getElementById('bg-blur-options');
   var blurInput = document.getElementById('bg-blur');
   var blurValue = document.getElementById('bg-blur-value');
   var photoHint = document.getElementById('bg-photo-hint');
@@ -86,7 +90,8 @@
 
   // ===== Aplicar na página =====
   function apply() {
-    var usePhoto = settings.bgType === 'photo' && settings.bgPhoto;
+    var useDefault = settings.bgType === 'default';
+    var usePhoto = useDefault || (settings.bgType === 'photo' && settings.bgPhoto);
     var useColor = settings.bgType === 'color';
     var color = useColor ? settings.bgColor : DEFAULT_BG;
 
@@ -98,7 +103,8 @@
 
     if (usePhoto) {
       // A data URL vem do canvas (base64), sem aspas: segura dentro de url("...").
-      bgLayer.style.backgroundImage = 'url("' + settings.bgPhoto + '")';
+      bgLayer.style.backgroundImage = 'url("' + (useDefault ? DEFAULT_PHOTO : settings.bgPhoto) + '")';
+      bgLayer.style.backgroundPosition = useDefault ? DEFAULT_PHOTO_POSITION : '';
       bgLayer.style.filter = settings.bgBlur > 0 ? 'blur(' + settings.bgBlur + 'px)' : '';
       // Aumenta um pouco para a borda borrada não aparecer.
       bgLayer.style.transform = settings.bgBlur > 0 ? 'scale(1.08)' : '';
@@ -136,7 +142,8 @@
     });
     blurInput.value = String(settings.bgBlur);
     blurValue.textContent = String(settings.bgBlur);
-    blurInput.disabled = !settings.bgPhoto;
+    blurOptions.hidden = settings.bgType === 'color';
+    blurInput.disabled = settings.bgType === 'photo' && !settings.bgPhoto;
     photoHint.hidden = Boolean(settings.bgPhoto);
     avatarRemove.disabled = !settings.avatar;
     avatarOptions.forEach(function (opt) {

@@ -47,7 +47,8 @@ App de checklist (uma única lista) feito como PWA estático e publicado no GitH
 │   └── avatar-2.png       foto de perfil pronta (colorida, de icons/icon-2.png)
 ├── img/
 │   ├── bob.webp           Bob Esponja acenando, animado e com fundo transparente (354×360, 51 quadros, 24 por segundo)
-│   └── bob-parado.png     primeiro quadro, para quem pede movimento reduzido
+│   ├── bob-parado.png     primeiro quadro, para quem pede movimento reduzido
+│   └── fundo-padrao.jpg   plano de fundo padrão (logo.jpeg sem a moldura preta, 634×635)
 ├── screenshots/
 │   ├── wide.png           captura de PC (1280×800) para a janela de instalação
 │   └── narrow.png         captura de celular (540×960)
@@ -56,7 +57,7 @@ App de checklist (uma única lista) feito como PWA estático e publicado no GitH
 ```
 
 Arquivos de origem (não usados pelo app nem cacheados pelo SW):
-- `logo.jpeg` (foto antiga, preto e branco) e `icons/icon-2.png` (foto atual, colorida): fotos para gerar ícones e fotos de perfil. Estão no repo.
+- `logo.jpeg` (foto antiga, preto e branco) e `icons/icon-2.png` (foto atual, colorida): fotos para gerar ícones, fotos de perfil e o fundo padrão. Estão no repo.
 - `img/bob-2.mp4` (origem do `img/bob.webp` atual) e `icons/bob.mp4` (primeiro vídeo do Bob, trocado porque o usuário não gostou do resultado): estão no repo (o usuário os commitou), mas não são usados pelo app nem cacheados pelo SW.
 
 ## Especificação
@@ -78,7 +79,7 @@ Arquivos de origem (não usados pelo app nem cacheados pelo SW):
    - fundo `#fbf6ee` (off-white quente), superfícies `#ffffff`, superfície suave `#f6efe4`, texto `#3d3431`, texto secundário `#6f645e`, borda de card `#e6dacb`, borda de campo `#9c8d7c`;
    - botão principal coral `#c0503b` com texto branco (o coral original `#e2725b` não tem contraste AA com texto branco e virou cor de detalhe: aro do avatar e seleção); amarelo-manteiga `#f5d565` / `#fff3c9` para destaques;
    - urgência alta `#d6564b` (etiqueta `#fbe3df`/`#a63a31`), "Atrasada" `#b23b30` com texto branco, urgência baixa `#7fb3cf` (etiqueta `#e3f0f7`/`#356a86`).
-   - O `theme_color`, o `background_color` do manifest e o `meta theme-color` são `#fbf6ee`. O contorno de foco é escuro (`#3d3431`) com um anel branco por dentro, para aparecer em qualquer fundo.
+   - O `theme_color`, o `background_color` do manifest e o `meta theme-color` do HTML são `#fbf6ee` (a tela de abertura do PWA); depois que o `settings.js` roda, o `meta theme-color` segue o fundo escolhido (`#3d3431` com o fundo padrão, que é foto). O contorno de foco é escuro (`#3d3431`) com um anel branco por dentro, para aparecer em qualquer fundo.
 8. **Concluir item**: o check marcado é verde (`--check: #2f7d57`, escuro o bastante para o navegador desenhar o ✓ branco). Ao marcar (clique ou Espaço), saem fogos de artifício pequenos do ponto onde estava o check: 3 explosões seguidas (0, 140 e 280 ms), cada uma com um clarão amarelo-manteiga e 10 faíscas coloridas (verde, mostarda, rosa, azul, coral e lilás; nada de branco, que some no fundo claro) com raio de 12–17 px (perto do tamanho da caixa de 22 px). Elas ficam em posição fixa na tela porque o item concluído desce na lista logo em seguida; lá, o check dá um "pulo" (classe `.just-done`). Desmarcar não solta fogos, e com `prefers-reduced-motion` não há fogos.
 
 ## Urgência e prazo
@@ -113,9 +114,10 @@ Aberto pelo botão de engrenagem no topo. As mudanças valem na hora e são salv
 
 - **Foto do perfil:** duas fotos prontas para tocar e escolher (`avatars/avatar-1.png` e `avatar-2.png`, 192 px, guardadas pelo caminho e no cache do SW), ou envio de outra imagem. A imagem enviada é recortada em quadrado (puxado para cima, onde costuma estar o rosto), reduzida para 192 px e salva em JPEG. Ela aparece como avatar redondo no topo e como ícone da aba do navegador. **O ícone do app instalado não muda** (ver "Limite do PWA").
 - **Plano de fundo:**
-  - *Padrão:* `#fbf6ee`.
+  - *Padrão:* a foto `img/fundo-padrao.jpg` (pedido do usuário), tratada como a opção *Foto*: camada `#app-bg` escurecida em 35%, `bg-dark`, `meta theme-color` `#3d3431` e desfoque pelo mesmo controle. Posição `45% 30%` para o rosto ficar mais para cima. Ela está no `ASSETS` do SW (funciona offline). Foi gerada do `logo.jpeg` cortando a moldura preta (8 px nas laterais, 11 em cima, 9 embaixo) com PowerShell + `System.Drawing`, JPEG 88, sem ampliar. Preferências antigas com `bgType: "default"` passam a mostrar a foto. O fundo areia liso (`#fbf6ee`) continua em *Cor sólida* → Areia.
   - *Cor sólida:* 6 cores prontas da paleta (areia, rosa, amarelo-manteiga, azul-céu, menta e chocolate) ou qualquer cor pelo seletor. Se a cor for escura (luminância ≤ 0,3), o `<html>` ganha a classe `bg-dark`: o texto sobre o fundo fica claro. O `meta theme-color` acompanha a cor.
-  - *Foto:* a imagem é reduzida para no máximo 1600 px e salva em JPEG. Fica numa camada fixa atrás do conteúdo (`#app-bg`), escurecida em 35%, com desfoque de 0 a 20 px. Com foto, o `<html>` também ganha `bg-dark` e o `meta theme-color` vira `#3d3431`.
+  - *Foto:* a imagem é reduzida para no máximo 1600 px e salva em JPEG. Fica numa camada fixa atrás do conteúdo (`#app-bg`), escurecida em 35%, com desfoque de 0 a 20 px. Com foto, o `<html>` também ganha `bg-dark` e o `meta theme-color` vira `#3d3431`. Sem foto enviada, o fundo fica liso (`#fbf6ee`) e o desfoque fica desativado.
+  - *Desfoque:* um controle só (`#bg-blur-options`), visível em *Padrão* e *Foto*, escondido em *Cor sólida*; o valor (`bgBlur`) vale para as duas fotos.
 - **Seus dados (exportar/importar):** é como levar a lista de um aparelho para outro sem servidor. "Exportar lista" gera `agendei-lista-AAAA-MM-DD.json` (`{ app: "agendei", version: 1, exportedAt, items }`, só os itens, sem as preferências): no celular (`pointer: coarse` + `navigator.canShare` com arquivos) abre o compartilhamento do sistema; no computador, baixa o arquivo. "Importar lista" aceita esse formato ou um array de itens, valida cada item como o `load()`, pede `confirm()` dizendo quantas tarefas são novas e quantas serão atualizadas, e **soma** à lista: mesmo `id` atualiza, `id` novo entra, nada é apagado. O resultado aparece em `#data-status`. Código em `app.js` (os botões ficam no painel Personalizar).
 - Se a imagem não couber no `localStorage`, o app avisa e mantém a preferência anterior.
 - Cores do que fica direto sobre o fundo (título, contador, estado vazio, rodapé) usam as variáveis `--on-bg`, `--on-bg-muted` e `--on-bg-border`.

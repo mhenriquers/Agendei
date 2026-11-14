@@ -126,7 +126,7 @@
 
         <div id="bg-color-options" class="panel-sub" hidden>
           <div class="swatches">
-            <button type="button" class="swatch" data-color="#fbf6ee" style="background:#fbf6ee"><span class="sr-only">Areia (padrão)</span></button>
+            <button type="button" class="swatch" data-color="#fbf6ee" style="background:#fbf6ee"><span class="sr-only">Areia</span></button>
             <button type="button" class="swatch" data-color="#f8e1e4" style="background:#f8e1e4"><span class="sr-only">Rosa</span></button>
             <button type="button" class="swatch" data-color="#fbf0c9" style="background:#fbf0c9"><span class="sr-only">Amarelo-manteiga</span></button>
             <button type="button" class="swatch" data-color="#dcebf3" style="background:#dcebf3"><span class="sr-only">Azul-céu</span></button>
@@ -142,6 +142,10 @@
             <input type="file" id="bg-file" accept="image/*" class="sr-only">
           </label>
           <p id="bg-photo-hint" class="hint">Escolha uma foto para usar como fundo.</p>
+        </div>
+
+        <!-- Desfoque: vale para as duas opções com foto (Padrão e Foto). -->
+        <div id="bg-blur-options" class="panel-sub" hidden>
           <label for="bg-blur" class="range-label">Desfoque: <output id="bg-blur-value" for="bg-blur">0</output> px</label>
           <input type="range" id="bg-blur" min="0" max="20" step="1" value="0">
         </div>
