@@ -12,7 +12,7 @@ App de checklist (uma única lista) feito como PWA estático e publicado no GitH
 
 - As tarefas estão em `task.md`, que contém **só tarefas**. Contexto, regras e especificação ficam aqui no `claude.md`.
 - Siga a ordem das tarefas e marque `[x]` em cada uma concluída. Tarefas concluídas são removidas do `task.md` (o histórico fica no git).
-- Tarefa grande é escrita no `task.md` destrinchada em passos triviais (onde colar, código completo, o que conferir, como testar), no estilo que a T1 (aviso de nova versão) teve.
+- Tarefa grande é escrita no `task.md` destrinchada em passos triviais (onde colar, código completo, o que conferir, como testar), como foi feito com o aviso de nova versão (ver o histórico do git do `task.md`).
 - **Ao terminar cada funcionalidade importante, faça commit e push** (um commit por funcionalidade). Mensagens de commit em português.
 - Quando o usuário pedir para "deixar as perguntas para depois", decida pelo mais sensato, siga em frente e registre a decisão aqui.
 - Em caso de dúvida, a seção "Especificação" abaixo vale como referência.
@@ -31,10 +31,11 @@ App de checklist (uma única lista) feito como PWA estático e publicado no GitH
 
 ```
 /
-├── index.html             estrutura da página (lista, faixa de atualização, painel Personalizar)
+├── index.html             estrutura da página (lista, aviso "vence hoje", Bob, faixa de atualização, painéis Editar tarefa e Personalizar)
 ├── styles.css             visual (responsivo; tokens de cor em :root)
 ├── settings.js            painel Personalizar: foto do perfil e plano de fundo
-├── app.js                 itens (estado, renderização, eventos, persistência), fogos ao concluir e aviso de atualização
+├── app.js                 itens (estado, render, eventos, persistência), urgência e prazo, painel Editar tarefa,
+│                          fogos ao concluir, exportar/importar, Bob e aviso de atualização
 ├── manifest.webmanifest   dados de instalação do PWA
 ├── sw.js                  service worker (cache offline)
 ├── icons/
@@ -54,12 +55,14 @@ App de checklist (uma única lista) feito como PWA estático e publicado no GitH
 └── README.md
 ```
 
-`logo.jpeg` (foto antiga, preto e branco) e `icons/icon-2.png` (foto atual, colorida) são fotos de origem para gerar os ícones. Elas estão no repo, mas não são usadas pelo app nem entram no cache do SW.
+Arquivos de origem (não usados pelo app nem cacheados pelo SW):
+- `logo.jpeg` (foto antiga, preto e branco) e `icons/icon-2.png` (foto atual, colorida): fotos para gerar ícones e fotos de perfil. Estão no repo.
+- `icons/bob.mp4` (origem do `img/bob.webp`) e `img/bob-2.mp4` (outro vídeo do Bob enviado pelo usuário, uso ainda não definido): ficam **fora do git**.
 
 ## Especificação
 
 1. **Nome do repo e do app**: `Agendei`. `start_url: "./"` e `scope: "./"`, sem `id` no manifest (ver "Notas técnicas"), então o manifest funciona com qualquer nome de repo.
-2. **Funcionalidades**: adicionar item, marcar/desmarcar como feito (com fogos de artifício ao concluir), editar (texto, urgência e prazo), excluir item, limpar concluídos, contador de pendentes, estado vazio, aviso "vence hoje", boas-vindas do Bob Esponja ao abrir. Uma única lista. Painel Personalizar (foto do perfil e plano de fundo). Aviso de nova versão.
+2. **Funcionalidades**: adicionar item, marcar/desmarcar como feito (com fogos de artifício ao concluir), editar (texto, urgência e prazo), excluir item, limpar concluídos, contador de pendentes, estado vazio, aviso "vence hoje", boas-vindas do Bob Esponja ao abrir e ao voltar para o app. Uma única lista. Painel Personalizar (foto do perfil, plano de fundo e exportar/importar). Aviso de nova versão.
 3. **Regras de negócio**:
    - Texto obrigatório após `trim()`; espaços internos repetidos viram um só.
    - Máximo de 200 caracteres (`maxlength` no input + corte no JS).
@@ -87,15 +90,15 @@ Decidido com o usuário (as decisões marcadas com * foram tomadas sem perguntar
 - **Etiqueta de prazo:** se o prazo é **hoje**, mostra só a hora ("14:30", ou "Hoje" sem hora); se é **outro dia**, mostra só a data ("Sex, 21/11", com o ano quando não é o ano atual)*; vencido mostra "Atrasada · 14:30" (hoje) ou "Atrasada · Ter, 17/11" (dia anterior), em vermelho. Item concluído mostra a etiqueta neutra.
 - **Urgência efetiva:** pendente com prazo hoje ou vencido vira **Alta** automaticamente (faixa e ordem). A urgência escolhida (`priority`) não muda: se o prazo for para outro dia, o card volta a ela.
 - **Ordem dos pendentes:** urgência efetiva (Alta → Normal → Baixa); no mesmo nível, prazo mais próximo primeiro (atrasadas no topo), sem prazo por último; empate pelo mais novo. Concluídos embaixo, mais recentemente concluídos primeiro. "Filtrar por urgência" é só essa ordem; não há botões de filtro*.
-- **Aviso "vence hoje":** faixa amarela abaixo do cabeçalho com "N tarefas vencem hoje", contando só pendentes com prazo para hoje (vencidas de dias anteriores não contam). Tocar leva até a primeira delas (rola, destaca o card e foca o check); o "×" esconde até o app abrir ou voltar para a tela (`visibilitychange`). Sem servidor, não há aviso com o app fechado; sem número no ícone (descartado pelo usuário).
+- **Aviso "vence hoje":** faixa amarela abaixo do cabeçalho com "N tarefas vencem hoje", contando só pendentes com prazo para hoje (vencidas de dias anteriores não contam). Tocar leva até a primeira delas (rola, destaca o card e foca o check); o "×" esconde até o app abrir ou voltar para a tela (`visibilitychange`). Sem número no ícone (descartado pelo usuário).
 - **Relógio com o app aberto:** a cada 30 s o app compara um resumo dos estados de prazo (`clockSignature`) e só redesenha a lista se algo mudou (virada do dia, hora do prazo passando). O render devolve o foco ao mesmo controle; com o painel de edição aberto, espera.
 - **Painel "Editar tarefa"** (lápis do card; `<dialog id="editor">`): texto, urgência (rádios), data, hora e botão "Sem prazo". Enter no texto salva, Esc ou "Cancelar" fecham sem salvar, e o foco volta ao lápis do card.
 
 ## Bob Esponja (boas-vindas)
 
-- Ao abrir o app (evento `load`) e sempre que a pessoa volta para ele (`visibilitychange`), depois de 0,5 s, o Bob sobe do canto inferior direito acenando, com o balão **"O que faremos hoje?"** à esquerda (do lado da mão que acena). Tocar no Bob ou no balão foca o campo "O que precisa fazer?" e ele sai. Ele também sai sozinho depois de 8 s ou quando o campo ganha foco. Não aparece se houver um painel aberto (`dialog[open]`) ou se o campo estiver com foco, e não reinicia a animação se ainda estiver na tela.
+- Ao abrir o app (evento `load`) e sempre que a pessoa volta para ele (`visibilitychange`), depois de 0,5 s, o Bob sobe do canto inferior direito acenando, com o balão **"O que faremos hoje?"** à direita dele (a pontinha do balão aponta para o Bob, à esquerda; antes ficava do outro lado e o usuário pediu para trocar). Tocar no Bob ou no balão foca o campo "O que precisa fazer?" e ele sai. Ele também sai sozinho depois de 8 s ou quando o campo ganha foco. Não aparece se houver um painel aberto (`dialog[open]`) ou se o campo estiver com foco, e não reinicia a animação se ainda estiver na tela.
 - O contêiner `#bob` tem `pointer-events: none` (só o Bob e o balão recebem toque), e com a faixa de atualização aberta (`body.has-update`) ele sobe para ficar acima dela. Com `prefers-reduced-motion`, o `<picture>` troca a animação por `img/bob-parado.png`.
-- **Origem da imagem:** o usuário forneceu `icons/bob.mp4` (1280×720, 3,4 s, fundo branco com faixas pretas; fica fora do git). Como MP4 não tem transparência e WebM com transparência não funciona no iPhone, o vídeo virou **WebP animado com alfa** (funciona em Chrome, Edge, Android e Safari 14+), gerado por um script Node que dirige o Edge (sem ffmpeg nesta máquina), guardado fora do repo:
+- **Origem da imagem** (o mesmo processo serve para outros vídeos de fundo liso): o usuário forneceu `icons/bob.mp4` (1280×720, 3,4 s, fundo branco com faixas pretas). Como MP4 não tem transparência e WebM com transparência não funciona no iPhone, o vídeo virou **WebP animado com alfa** (funciona em Chrome, Edge, Android e Safari 14+), gerado por um script Node que dirige o Edge (sem ffmpeg nesta máquina), guardado fora do repo:
   - recorte: caixa calculada com todos os quadros (30 por segundo) + margem, reduzido para 320 px de altura, 15 quadros por segundo;
   - fundo: branco quase puro e neutro ligado à borda do quadro vira transparente, com contorno suave (alfa pela "brancura" e cor descontaminada do branco, sem auréola);
   - buracos: região branca **fechada** que é fundo em ≥ 50% dos outros quadros, com ≥ 150 px e cor média ≥ 249 também vira transparente (é o vão entre o braço e a cabeça, e entre o braço na cintura e o corpo). Olhos, dentes e camisa nunca são fundo; a manga, que muda de lugar, é pequena e sombreada. Limites tirados da medição de todas as regiões fechadas dos 51 quadros;
@@ -121,7 +124,6 @@ Aberto pelo botão de engrenagem no topo. As mudanças valem na hora e são salv
 - A faixa só aparece se já existe um SW controlando a página (senão seria a primeira instalação).
 - O registro usa `updateViaCache: "none"` e o install busca os arquivos com `cache: "reload"`. O GitHub Pages manda `Cache-Control: max-age=600`, e sem isso o navegador usava cópias velhas do `sw.js` e dos arquivos (um teste com o Edge mostrou o app preso na versão antiga por causa disso).
 - O app procura versão nova ao abrir e sempre que volta para a tela (`visibilitychange`). Offline, a verificação falha em silêncio.
-- Sem notificação push (fora do escopo): com o app fechado não há aviso.
 
 ## Ícones
 
@@ -140,7 +142,7 @@ Os ícones atuais vêm de `icons/icon-2.png` (foto vertical 864×1536), com um r
 - **Dados ficam só no aparelho:** cada navegador/aparelho tem a sua lista; não há sincronização entre PC e celular. Para levar a lista, use exportar/importar (painel Personalizar). Sincronizar de verdade exigiria servidor e login (fora do escopo). No iPhone, o app instalado e o Safari também têm dados separados.
 - **`id` do manifest:** o navegador resolve o `id` a partir da raiz do domínio, não da pasta do app. Com `"id": "./"`, o ID virava `https://mhenriquers.github.io/` e podia se confundir com outro PWA publicado no mesmo usuário. Por isso o manifest **não tem `id`**: o ID é o `start_url` (`https://mhenriquers.github.io/Agendei/`). Trocar o ID faz o navegador tratar o app como outro: quem já instalou precisa desinstalar e instalar de novo.
 - **Capturas de tela:** o manifest declara `screenshots/wide.png` (`form_factor: "wide"`) e `screenshots/narrow.png`, para o Chrome mostrar a janela de instalação com imagens. Elas também estão no `ASSETS` do SW. Se o visual mudar, regerar.
-- **Notificações com o app fechado** não são viáveis sem servidor (as APIs de agendamento local foram abandonadas ou não são confiáveis). Avisos acontecem quando o app é aberto.
+- **Sem avisos com o app fechado:** notificação exigiria servidor (push, fora do escopo), e as APIs de agendamento local foram abandonadas ou não são confiáveis. Todos os avisos (vence hoje, nova versão, Bob) acontecem quando o app é aberto ou volta para a tela.
 
 ## Publicação (GitHub Pages)
 
@@ -157,11 +159,22 @@ npx --yes http-server -c-1 -p 8000
 
 Para simular o GitHub Pages (subpasta), rode o mesmo comando em `c:/dev` e abra `http://localhost:8000/Agendei/`. Para simular também o cache do Pages, use `-c600` no lugar de `-c-1`. O npx serve só para testar, nada entra no repo.
 
-**Testes automatizados (fora do repo):** dá para dirigir o Edge sem janela pelo DevTools Protocol com um script Node (Node 24 tem `fetch` e `WebSocket` globais, sem instalar nada), guardado na pasta temporária. Cuidados aprendidos:
+**Testes automatizados (fora do repo):** dá para dirigir o Edge sem janela pelo DevTools Protocol com um script Node (Node 24 tem `fetch` e `WebSocket` globais, sem instalar nada), guardado na pasta temporária (que pode ser apagada; recrie a partir daqui). Baterias que existiam, e o que cobriam:
+- **geral (30):** aviso de nova versão (primeira visita sem recarregar, faixa, Atualizar, voltar para a tela, offline, 360 px, teclado) e painel Personalizar (cor, foto, desfoque, avatar enviado, dado corrompido);
+- **prazo (28):** ordem, etiquetas, urgência efetiva, item antigo/inválido, aviso "vence hoje", painel Editar tarefa (Enter, Esc, texto vazio, hora sem data, Sem prazo), relógio passando e virada do dia;
+- **exportar/importar (13):** download real, conteúdo do arquivo, confirmação, soma sem apagar, arquivos inválidos;
+- **fotos de perfil (11):** escolher, ícone da aba, offline, remover, caminho desconhecido;
+- **Bob (21):** aparece ao abrir e ao voltar, some sozinho, toque leva ao campo, não aparece com painel aberto ou campo em uso, fica acima da faixa, movimento reduzido, 360 px.
+
+Cuidados aprendidos:
 - `msedge --headless --screenshot` não renderiza larguras menores que ~500 px e fecha antes do SW verificar atualizações. Para larguras de celular e para testar o SW, use o protocolo (`Emulation.setDeviceMetricsOverride`, `Page.captureScreenshot`).
-- Para testar atualização, sirva uma **cópia** do app com `-c600`, altere a cópia (`CACHE_NAME` e um texto visível) e recarregue.
+- Para testar atualização, sirva uma **cópia** do app com `-c600`, altere a cópia (a linha `CACHE_NAME = '…'`, não o comentário do topo, que também cita "checklist-v1") e recarregue.
+- Relógio: congele a data com `Page.addScriptToEvaluateOnNewDocument` (uma classe `Date` com deslocamento ajustável) para testar prazos sem depender do dia real.
+- Foco: sem `Emulation.setFocusEmulationEnabled`, o Edge sem janela não dispara eventos de `focus`.
+- Teclado: Enter simulado precisa de `text: "\r"` no `Input.dispatchKeyEvent` para enviar o formulário.
+- `DOM.setFileInputFiles` simula a escolha de arquivos; `Browser.setDownloadBehavior` deixa baixar de verdade; `Page.javascriptDialogOpening` + `Page.handleJavaScriptDialog` respondem ao `confirm()`.
+- `ImageDecoder` confere se um WebP é animado e lê quadros específicos.
 - Servidor iniciado em segundo plano dentro de um comando com pipe (`… | grep`) prende o pipe e o comando nunca termina: inicie com `</dev/null >/dev/null 2>&1` também no subshell, ou antes do comando.
-- `DOM.setFileInputFiles` simula a escolha de arquivos no painel Personalizar.
 
 ## Ambiente de desenvolvimento
 
