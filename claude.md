@@ -57,7 +57,7 @@ App de checklist (uma única lista) feito como PWA estático e publicado no GitH
 
 Arquivos de origem (não usados pelo app nem cacheados pelo SW):
 - `logo.jpeg` (foto antiga, preto e branco) e `icons/icon-2.png` (foto atual, colorida): fotos para gerar ícones e fotos de perfil. Estão no repo.
-- `img/bob-2.mp4` (origem do `img/bob.webp` atual) e `icons/bob.mp4` (primeiro vídeo do Bob, trocado porque o usuário não gostou do resultado): ficam **fora do git**.
+- `img/bob-2.mp4` (origem do `img/bob.webp` atual) e `icons/bob.mp4` (primeiro vídeo do Bob, trocado porque o usuário não gostou do resultado): estão no repo (o usuário os commitou), mas não são usados pelo app nem cacheados pelo SW.
 
 ## Especificação
 
