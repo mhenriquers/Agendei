@@ -95,6 +95,21 @@ Decidido com o usuário (as decisões marcadas com * foram tomadas sem perguntar
 - **Relógio com o app aberto:** a cada 30 s o app compara um resumo dos estados de prazo (`clockSignature`) e só redesenha a lista se algo mudou (virada do dia, hora do prazo passando). O render devolve o foco ao mesmo controle; com o painel de edição aberto, espera.
 - **Painel "Editar tarefa"** (lápis do card; `<dialog id="editor">`): texto, urgência (rádios), data, hora e botão "Sem prazo". Enter no texto salva, Esc ou "Cancelar" fecham sem salvar, e o foco volta ao lápis do card.
 
+## Botão "+" e painel "Nova tarefa" (em implementação: tarefas T1 e T2 do `task.md`)
+
+Pedido do usuário: tirar da tela inicial o campo de digitar e o botão "Adicionar"; no lugar, um botão **"+"** no canto inferior direito que abre um painel com o que é preciso para criar a tarefa. O botão pode ser **arrastado** para outro lugar da tela. As decisões marcadas com * foram tomadas sem perguntar e podem ser revistas.
+
+- **Botão "+"** (`<button id="add-button" class="fab">`): círculo coral (`--accent`) de 56 px com "+" branco, fixo no canto inferior direito (16 px da borda + área segura). Nome acessível "Nova tarefa". Com a faixa de atualização aberta, sobe para ficar acima dela (como o Bob), a não ser que tenha sido arrastado. A página ganha 72 px a mais de espaço embaixo para o botão não cobrir "Limpar concluídos".
+- **Painel "Nova tarefa"**: é o mesmo `<dialog id="editor">` do "Editar tarefa"*, com os mesmos campos (texto, urgência, data, hora, "Sem prazo"). Muda só o título ("Nova tarefa" / "Editar tarefa") e o botão de confirmar ("Adicionar" / "Salvar"). Abre vazio, com urgência Normal e sem prazo, e o foco no texto.
+  - Texto vazio (ou só espaços) não adiciona: o painel continua aberto e o navegador mostra "Preencha este campo" (`required` só no modo novo; na edição, texto vazio continua mantendo o texto anterior).
+  - Enter no texto adiciona. Esc ou "Cancelar" fecham sem adicionar, e o foco volta ao "+".
+  - Depois de adicionar: o painel fecha, o card novo é destacado (mesmo efeito `.flash` do aviso "vence hoje") e rolado para a vista se precisar*, e o foco volta ao "+".
+  - As regras de texto (trim, espaços repetidos, 200 caracteres) e de prazo (hora sem data vale para hoje) são as mesmas da edição.
+- **Arrastar**: com o dedo ou o mouse, depois de mover mais de 8 px é arrasto (o painel não abre); menos que isso é toque (abre o painel). O botão nunca sai da tela (margem de 8 px). A posição fica **guardada*** no `checklist.settings.v1`, campo `fabPos: { x, y } | null` (centro do botão como fração da largura e da altura da tela, 0 a 1; `null` = canto padrão), e é recalculada quando a janela muda de tamanho ou o celular gira. Não há opção para voltar ao canto*: é só arrastar de volta. Pelo teclado o botão funciona normal (Enter/Espaço abrem o painel); mover é só arrastando.
+- **Bob**: tocar no Bob ou no balão abre o painel "Nova tarefa". Ele sai quando o painel abre e não aparece com painel aberto (regra que já existia).
+- **Estado vazio**: "Nenhum item ainda. Toque no + para adicionar."*
+- Onde o foco ia para o campo antigo (depois de excluir o último item, de "Limpar concluídos" e de fechar o aviso "vence hoje"), agora vai para o "+".
+
 ## Bob Esponja (boas-vindas)
 
 - Ao abrir o app (evento `load`) e sempre que a pessoa volta para ele (`visibilitychange`), depois de 0,5 s, o Bob sobe do canto inferior esquerdo acenando, com o balão **"O que faremos hoje?"** à direita dele (a pontinha do balão aponta para o Bob, à esquerda; antes ficava do outro lado e o usuário pediu para trocar). Tocar no Bob ou no balão foca o campo "O que precisa fazer?" e ele sai. Ele também sai sozinho depois de 8 s ou quando o campo ganha foco. Não aparece se houver um painel aberto (`dialog[open]`) ou se o campo estiver com foco, e não reinicia a animação se ainda estiver na tela.
