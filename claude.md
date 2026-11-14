@@ -56,6 +56,7 @@ App de checklist (uma única lista) feito como PWA estático e publicado no GitH
 5. **Modelo das preferências**: `{ bgType: "default" | "color" | "photo", bgColor: "#rrggbb", bgPhoto: dataURL | null, bgBlur: 0–20, avatar: dataURL | null }`, salvo como JSON em `checklist.settings.v1`. Valor inválido ou corrompido volta para o padrão.
 6. **Idioma**: português (pt-BR).
 7. **Visual**: tema único, monocromático (preto e branco), sem variação claro/escuro do sistema. Fundo padrão `#262626` (um pouco mais escuro que grafite), superfícies `#333333`, texto e botão principal `#f5f5f5`, texto secundário `#a3a3a3`, bordas `#737373`. O `theme_color` e o `background_color` do manifest e o `meta theme-color` são `#262626`. O contorno de foco é branco com um anel preto por dentro, para aparecer em qualquer fundo.
+8. **Concluir item**: a única cor fora do preto e branco é o check verde (`--check: #15803d`, escuro o bastante para o navegador desenhar o ✓ branco). Ao marcar (clique ou Espaço), saem fogos de artifício pequenos do ponto onde estava o check: 3 explosões seguidas (0, 140 e 280 ms), cada uma com um clarão branco e 10 faíscas coloridas com raio de 12–17 px (perto do tamanho da caixa de 22 px). Elas ficam em posição fixa na tela porque o item concluído desce na lista logo em seguida; lá, o check dá um "pulo" (classe `.just-done`). Desmarcar não solta fogos, e com `prefers-reduced-motion` não há fogos.
 
 ## Painel Personalizar (`settings.js`)
 

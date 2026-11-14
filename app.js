@@ -126,9 +126,13 @@
   var clearBtn = document.getElementById('clear-done');
 
   var editingId = null;
+  // Item que acabou de ser concluído: ganha a classe .just-done (pulo do check) no próximo render.
+  var justDoneId = null;
 
   function render() {
     editingId = null;
+    var popId = justDoneId;
+    justDoneId = null;
     list.textContent = '';
 
     var sorted = sortedItems();
@@ -138,6 +142,7 @@
       var li = template.content.firstElementChild.cloneNode(true);
       li.dataset.id = item.id;
       li.classList.toggle('done', item.done);
+      if (item.id === popId) li.classList.add('just-done');
 
       var checkbox = li.querySelector('.item-toggle');
       checkbox.checked = item.done;
@@ -209,6 +214,49 @@
     field.setSelectionRange(field.value.length, field.value.length);
   }
 
+  // ===== Fogos de artifício ao concluir =====
+  // Três explosões pequenas (raio próximo ao tamanho da caixa de check), em
+  // sequência, saindo do ponto onde o check estava. Posição fixa na tela,
+  // porque o item concluído muda de lugar na lista logo em seguida.
+  var reduceMotion = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+  var SPARK_COLORS = ['#22c55e', '#facc15', '#f472b6', '#38bdf8', '#fb923c', '#ffffff'];
+  var BURSTS = [
+    { dx: 0, dy: 0, delay: 0 },
+    { dx: -16, dy: -14, delay: 140 },
+    { dx: 16, dy: -16, delay: 280 }
+  ];
+  var SPARKS_PER_BURST = 10;
+
+  function fireworks(x, y) {
+    if (reduceMotion && reduceMotion.matches) return;
+    BURSTS.forEach(function (b) {
+      var burst = document.createElement('div');
+      burst.className = 'firework';
+      burst.setAttribute('aria-hidden', 'true');
+      burst.style.left = (x + b.dx) + 'px';
+      burst.style.top = (y + b.dy) + 'px';
+      var flash = document.createElement('span');
+      flash.className = 'firework-flash';
+      flash.style.animationDelay = b.delay + 'ms';
+      burst.appendChild(flash);
+      for (var i = 0; i < SPARKS_PER_BURST; i++) {
+        var angle = (i / SPARKS_PER_BURST) * 360 + Math.random() * 20;
+        var dist = 12 + Math.random() * 5; // raio da explosão ~ tamanho da caixa de 22px
+        var color = SPARK_COLORS[(i + b.delay) % SPARK_COLORS.length];
+        var spark = document.createElement('span');
+        spark.className = 'firework-spark';
+        spark.style.setProperty('--a', angle.toFixed(0) + 'deg');
+        spark.style.setProperty('--d', dist.toFixed(1) + 'px');
+        spark.style.background = color;
+        spark.style.color = color; // usado pelo brilho (box-shadow currentColor)
+        spark.style.animationDelay = b.delay + 'ms';
+        burst.appendChild(spark);
+      }
+      document.body.appendChild(burst);
+      setTimeout(function () { burst.remove(); }, b.delay + 800);
+    });
+  }
+
   function cssEscape(value) {
     if (window.CSS && typeof window.CSS.escape === 'function') return window.CSS.escape(value);
     return String(value).replace(/["\\]/g, '\\$&');
@@ -226,7 +274,14 @@
   list.addEventListener('change', function (event) {
     if (!event.target.classList.contains('item-toggle')) return;
     var li = event.target.closest('.item');
-    if (li) toggleItem(li.dataset.id);
+    if (!li) return;
+    if (event.target.checked) {
+      // Marcou como concluído: fogos saindo do centro da caixa de check.
+      var box = event.target.getBoundingClientRect();
+      fireworks(box.left + box.width / 2, box.top + box.height / 2);
+      justDoneId = li.dataset.id;
+    }
+    toggleItem(li.dataset.id);
   });
 
   list.addEventListener('click', function (event) {
