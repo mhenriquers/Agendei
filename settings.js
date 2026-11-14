@@ -11,6 +11,9 @@
   var PHOTO_THEME = '#3d3431'; // cor da barra do sistema com foto de fundo (escurecida)
   var MAX_BLUR = 20;
 
+  // Fotos de perfil prontas (PNG no repo, também no cache do SW).
+  var AVATAR_PRESETS = ['./avatars/avatar-1.png', './avatars/avatar-2.png'];
+
   var defaults = { bgType: 'default', bgColor: DEFAULT_BG, bgPhoto: null, bgBlur: 0, avatar: null };
 
   function isColor(value) {
@@ -32,7 +35,7 @@
       if (typeof data.bgBlur === 'number' && data.bgBlur >= 0 && data.bgBlur <= MAX_BLUR) {
         s.bgBlur = Math.round(data.bgBlur);
       }
-      if (isImageData(data.avatar)) s.avatar = data.avatar;
+      if (isImageData(data.avatar) || AVATAR_PRESETS.indexOf(data.avatar) >= 0) s.avatar = data.avatar;
     } catch (err) { /* dado corrompido: usa o padrão */ }
     return s;
   }
@@ -61,6 +64,7 @@
   var openBtn = document.getElementById('open-settings');
   var avatarFile = document.getElementById('avatar-file');
   var avatarRemove = document.getElementById('avatar-remove');
+  var avatarOptions = document.querySelectorAll('.avatar-option');
   var typeRadios = document.querySelectorAll('input[name="bg-type"]');
   var colorOptions = document.getElementById('bg-color-options');
   var photoOptions = document.getElementById('bg-photo-options');
@@ -108,7 +112,7 @@
       avatarImg.src = settings.avatar;
       avatarImg.hidden = false;
       if (favicon) {
-        favicon.setAttribute('type', 'image/jpeg');
+        favicon.setAttribute('type', isImageData(settings.avatar) ? 'image/jpeg' : 'image/png');
         favicon.setAttribute('href', settings.avatar);
       }
     } else {
@@ -135,6 +139,9 @@
     blurInput.disabled = !settings.bgPhoto;
     photoHint.hidden = Boolean(settings.bgPhoto);
     avatarRemove.disabled = !settings.avatar;
+    avatarOptions.forEach(function (opt) {
+      opt.setAttribute('aria-pressed', String(opt.dataset.avatar === settings.avatar));
+    });
   }
 
   function update(changes) {
@@ -210,6 +217,10 @@
     avatarFile.value = '';
     if (!file) return;
     processImage(file, 192, true).then(function (data) { update({ avatar: data }); }, imageError);
+  });
+
+  avatarOptions.forEach(function (opt) {
+    opt.addEventListener('click', function () { update({ avatar: opt.dataset.avatar }); });
   });
 
   avatarRemove.addEventListener('click', function () {

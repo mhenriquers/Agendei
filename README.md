@@ -10,7 +10,7 @@ Checklist simples que funciona offline e pode ser instalado no celular ou no com
 - Os dados ficam salvos no próprio navegador (`localStorage`, chaves `checklist.items.v1` e `checklist.settings.v1`); não há conta nem servidor
 - Funciona sem internet depois do primeiro acesso
 - Visual claro em off-white, coral e amarelo-manteiga; check verde com fogos de artifício ao concluir
-- Painel **Personalizar** (engrenagem no topo): foto do perfil, plano de fundo (cor sólida ou foto com desfoque) e exportar/importar a lista para levar a outro aparelho
+- Painel **Personalizar** (engrenagem no topo): foto do perfil (duas prontas ou enviada), plano de fundo (cor sólida ou foto com desfoque) e exportar/importar a lista para levar a outro aparelho
 - Avisa quando há uma versão nova publicada
 
 Feito com HTML, CSS e JavaScript puros, sem build e sem dependências.
@@ -56,6 +56,7 @@ app.js                 itens, persistência e aviso de nova versão
 manifest.webmanifest   dados de instalação do PWA
 sw.js                  service worker (cache offline)
 icons/                 ícones PNG 192, 512 e 512 maskable
+avatars/               duas fotos de perfil prontas (192 px)
 screenshots/           capturas usadas na janela de instalação
 .nojekyll              impede o GitHub Pages de processar o site com Jekyll
 ```

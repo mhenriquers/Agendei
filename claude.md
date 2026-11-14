@@ -41,6 +41,9 @@ App de checklist (uma única lista) feito como PWA estático e publicado no GitH
 │   ├── icon-192.png
 │   ├── icon-512.png
 │   └── icon-maskable-512.png
+├── avatars/
+│   ├── avatar-1.png       foto de perfil pronta (preto e branco, de logo.jpeg)
+│   └── avatar-2.png       foto de perfil pronta (colorida, de icons/icon-2.png)
 ├── screenshots/
 │   ├── wide.png           captura de PC (1280×800) para a janela de instalação
 │   └── narrow.png         captura de celular (540×960)
@@ -63,7 +66,7 @@ App de checklist (uma única lista) feito como PWA estático e publicado no GitH
    - Excluir um item é direto, sem confirmação. "Limpar concluídos" pede `confirm()` porque apaga vários.
    - Na edição, texto vazio mantém o texto anterior (não exclui).
 4. **Modelo do item**: `{ id: string, text: string, done: boolean, createdAt: number, doneAt: number | null, priority: "low" | "normal" | "high", dueDate: "AAAA-MM-DD" | null, dueTime: "HH:MM" | null }`. No storage, salvo como array JSON em `checklist.items.v1`. Datas e horas são do fuso do aparelho. `dueTime` só existe com `dueDate`. O `load()` valida cada item e descarta campos desconhecidos (`cleanItem` em `app.js`): itens antigos sem `priority`/`dueDate`/`dueTime`, ou com valores inválidos, ficam Normal e sem prazo. Ao acrescentar campos novos, atualize a validação e o mapeamento.
-5. **Modelo das preferências**: `{ bgType: "default" | "color" | "photo", bgColor: "#rrggbb", bgPhoto: dataURL | null, bgBlur: 0–20, avatar: dataURL | null }`, salvo como JSON em `checklist.settings.v1`. Valor inválido ou corrompido volta para o padrão.
+5. **Modelo das preferências**: `{ bgType: "default" | "color" | "photo", bgColor: "#rrggbb", bgPhoto: dataURL | null, bgBlur: 0–20, avatar: dataURL | "./avatars/avatar-1.png" | "./avatars/avatar-2.png" | null }`, salvo como JSON em `checklist.settings.v1`. Valor inválido ou corrompido volta para o padrão.
 6. **Idioma**: português (pt-BR).
 7. **Visual — paleta "Areia e coral"** (escolhida pelo usuário depois de achar o preto e branco "sem graça"): tema único e claro, sem variação claro/escuro do sistema. Tokens em `:root` no `styles.css`:
    - fundo `#fbf6ee` (off-white quente), superfícies `#ffffff`, superfície suave `#f6efe4`, texto `#3d3431`, texto secundário `#6f645e`, borda de card `#e6dacb`, borda de campo `#9c8d7c`;
@@ -89,7 +92,7 @@ Decidido com o usuário (as decisões marcadas com * foram tomadas sem perguntar
 
 Aberto pelo botão de engrenagem no topo. As mudanças valem na hora e são salvas em `checklist.settings.v1`.
 
-- **Foto do perfil:** a imagem enviada é recortada em quadrado (puxado para cima, onde costuma estar o rosto), reduzida para 192 px e salva em JPEG. Ela aparece como avatar redondo no topo e como ícone da aba do navegador. **O ícone do app instalado não muda** (ver "Limite do PWA").
+- **Foto do perfil:** duas fotos prontas para tocar e escolher (`avatars/avatar-1.png` e `avatar-2.png`, 192 px, guardadas pelo caminho e no cache do SW), ou envio de outra imagem. A imagem enviada é recortada em quadrado (puxado para cima, onde costuma estar o rosto), reduzida para 192 px e salva em JPEG. Ela aparece como avatar redondo no topo e como ícone da aba do navegador. **O ícone do app instalado não muda** (ver "Limite do PWA").
 - **Plano de fundo:**
   - *Padrão:* `#fbf6ee`.
   - *Cor sólida:* 6 cores prontas da paleta (areia, rosa, amarelo-manteiga, azul-céu, menta e chocolate) ou qualquer cor pelo seletor. Se a cor for escura (luminância ≤ 0,3), o `<html>` ganha a classe `bg-dark`: o texto sobre o fundo fica claro. O `meta theme-color` acompanha a cor.

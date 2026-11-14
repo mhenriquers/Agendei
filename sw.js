@@ -12,7 +12,7 @@
  */
 'use strict';
 
-var CACHE_NAME = 'checklist-v9';
+var CACHE_NAME = 'checklist-v10';
 
 var ASSETS = [
   './',
@@ -24,6 +24,8 @@ var ASSETS = [
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/icon-maskable-512.png',
+  './avatars/avatar-1.png',
+  './avatars/avatar-2.png',
   './screenshots/wide.png',
   './screenshots/narrow.png'
 ];
