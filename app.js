@@ -523,6 +523,100 @@
     if (clockSignature(new Date()) !== lastClockSignature) render();
   }, 30000);
 
+  // ===== Exportar / importar a lista (painel Personalizar) =====
+  // Arquivo JSON: { app: "agendei", version: 1, exportedAt, items: [...] }.
+  // Importar soma à lista: itens com o mesmo id são atualizados, os outros entram.
+  var exportBtn = document.getElementById('export-list');
+  var importFile = document.getElementById('import-file');
+  var dataStatus = document.getElementById('data-status');
+
+  function plural(n, one, many) {
+    return n === 1 ? '1 ' + one : n + ' ' + many;
+  }
+
+  function downloadFile(file) {
+    var url = URL.createObjectURL(file);
+    var link = document.createElement('a');
+    link.href = url;
+    link.download = file.name;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
+  }
+
+  exportBtn.addEventListener('click', function () {
+    if (items.length === 0) {
+      dataStatus.textContent = 'Sua lista está vazia: não há nada para exportar.';
+      return;
+    }
+    var payload = { app: 'agendei', version: 1, exportedAt: new Date().toISOString(), items: items };
+    var name = 'agendei-lista-' + dateStr(new Date()) + '.json';
+    var file = new File([JSON.stringify(payload, null, 2)], name, { type: 'application/json' });
+    var done = 'Lista exportada (' + plural(items.length, 'tarefa', 'tarefas') + ').';
+
+    // No celular, abre o compartilhamento do sistema; no computador, baixa o arquivo.
+    var touch = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+    if (touch && navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({ files: [file], title: 'Lista do Agendei' }).then(function () {
+        dataStatus.textContent = done;
+      }, function (err) {
+        if (err && err.name === 'AbortError') return; // a pessoa cancelou
+        downloadFile(file);
+        dataStatus.textContent = done;
+      });
+    } else {
+      downloadFile(file);
+      dataStatus.textContent = done;
+    }
+  });
+
+  importFile.addEventListener('change', function () {
+    var file = importFile.files[0];
+    importFile.value = '';
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function () {
+      var data;
+      try {
+        data = JSON.parse(String(reader.result));
+      } catch (err) {
+        data = null;
+      }
+      var fromFile = Array.isArray(data) ? data : (data && Array.isArray(data.items) ? data.items : null);
+      if (!fromFile) {
+        dataStatus.textContent = 'Esse arquivo não é uma lista do Agendei.';
+        return;
+      }
+      var incoming = fromFile.filter(isValidItem).map(cleanItem)
+        .filter(function (item) { return item.text.length > 0; });
+      if (incoming.length === 0) {
+        dataStatus.textContent = 'O arquivo não tem nenhuma tarefa válida.';
+        return;
+      }
+      var updated = incoming.filter(function (item) { return findItem(item.id); }).length;
+      var added = incoming.length - updated;
+      var question = 'Importar ' + plural(incoming.length, 'tarefa', 'tarefas') + '?\n' +
+        plural(added, 'nova será somada', 'novas serão somadas') + ' à lista' +
+        (updated ? ' e ' + plural(updated, 'que já existe será atualizada', 'que já existem serão atualizadas') : '') + '.';
+      if (!window.confirm(question)) return;
+      incoming.forEach(function (item) {
+        var current = findItem(item.id);
+        if (current) {
+          Object.assign(current, item);
+        } else {
+          items.push(item);
+        }
+      });
+      commit();
+      dataStatus.textContent = plural(incoming.length, 'tarefa importada', 'tarefas importadas') + '.';
+    };
+    reader.onerror = function () {
+      dataStatus.textContent = 'Não deu para ler esse arquivo.';
+    };
+    reader.readAsText(file);
+  });
+
   // Sincronização entre abas.
   window.addEventListener('storage', function (event) {
     if (event.key !== STORAGE_KEY && event.key !== null) return;

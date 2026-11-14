@@ -94,6 +94,7 @@ Aberto pelo botão de engrenagem no topo. As mudanças valem na hora e são salv
   - *Padrão:* `#fbf6ee`.
   - *Cor sólida:* 6 cores prontas da paleta (areia, rosa, amarelo-manteiga, azul-céu, menta e chocolate) ou qualquer cor pelo seletor. Se a cor for escura (luminância ≤ 0,3), o `<html>` ganha a classe `bg-dark`: o texto sobre o fundo fica claro. O `meta theme-color` acompanha a cor.
   - *Foto:* a imagem é reduzida para no máximo 1600 px e salva em JPEG. Fica numa camada fixa atrás do conteúdo (`#app-bg`), escurecida em 35%, com desfoque de 0 a 20 px. Com foto, o `<html>` também ganha `bg-dark` e o `meta theme-color` vira `#3d3431`.
+- **Seus dados (exportar/importar):** é como levar a lista de um aparelho para outro sem servidor. "Exportar lista" gera `agendei-lista-AAAA-MM-DD.json` (`{ app: "agendei", version: 1, exportedAt, items }`, só os itens, sem as preferências): no celular (`pointer: coarse` + `navigator.canShare` com arquivos) abre o compartilhamento do sistema; no computador, baixa o arquivo. "Importar lista" aceita esse formato ou um array de itens, valida cada item como o `load()`, pede `confirm()` dizendo quantas tarefas são novas e quantas serão atualizadas, e **soma** à lista: mesmo `id` atualiza, `id` novo entra, nada é apagado. O resultado aparece em `#data-status`. Código em `app.js` (os botões ficam no painel Personalizar).
 - Se a imagem não couber no `localStorage`, o app avisa e mantém a preferência anterior.
 - Cores do que fica direto sobre o fundo (título, contador, estado vazio, rodapé) usam as variáveis `--on-bg`, `--on-bg-muted` e `--on-bg-border`.
 
@@ -120,7 +121,7 @@ Os ícones atuais vêm de `icons/icon-2.png` (foto vertical 864×1536), com um r
 
 ## Notas técnicas
 
-- **Dados ficam só no aparelho:** cada navegador/aparelho tem a sua lista; não há sincronização entre PC e celular. Sincronizar de verdade exigiria servidor e login (fora do escopo). No iPhone, o app instalado e o Safari também têm dados separados.
+- **Dados ficam só no aparelho:** cada navegador/aparelho tem a sua lista; não há sincronização entre PC e celular. Para levar a lista, use exportar/importar (painel Personalizar). Sincronizar de verdade exigiria servidor e login (fora do escopo). No iPhone, o app instalado e o Safari também têm dados separados.
 - **`id` do manifest:** o navegador resolve o `id` a partir da raiz do domínio, não da pasta do app. Com `"id": "./"`, o ID virava `https://mhenriquers.github.io/` e podia se confundir com outro PWA publicado no mesmo usuário. Por isso o manifest **não tem `id`**: o ID é o `start_url` (`https://mhenriquers.github.io/Agendei/`). Trocar o ID faz o navegador tratar o app como outro: quem já instalou precisa desinstalar e instalar de novo.
 - **Capturas de tela:** o manifest declara `screenshots/wide.png` (`form_factor: "wide"`) e `screenshots/narrow.png`, para o Chrome mostrar a janela de instalação com imagens. Elas também estão no `ASSETS` do SW. Se o visual mudar, regerar.
 - **Notificações com o app fechado** não são viáveis sem servidor (as APIs de agendamento local foram abandonadas ou não são confiáveis). Avisos acontecem quando o app é aberto.

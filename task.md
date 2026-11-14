@@ -8,6 +8,5 @@ Contexto, regras e especificação estão no `claude.md`.
 
 ## T3 — Outras ideias (ainda não decididas)
 
-- [ ] **T3.1** Exportar/importar a lista (arquivo ou texto), para levar os itens de um aparelho para outro sem servidor.
 - [ ] **T3.2** Duas fotos de perfil prontas no painel Personalizar (a de `logo.jpeg` e a de `icons/icon-2.png`, em `avatars/` como PNG de 192 px), além do envio de foto.
 - [ ] **T3.3** Desenho do Bob Esponja: o usuário vai fornecer o arquivo; posição ainda não definida (a prévia usou um espaço no canto do cabeçalho).

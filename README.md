@@ -10,7 +10,7 @@ Checklist simples que funciona offline e pode ser instalado no celular ou no com
 - Os dados ficam salvos no próprio navegador (`localStorage`, chaves `checklist.items.v1` e `checklist.settings.v1`); não há conta nem servidor
 - Funciona sem internet depois do primeiro acesso
 - Visual claro em off-white, coral e amarelo-manteiga; check verde com fogos de artifício ao concluir
-- Painel **Personalizar** (engrenagem no topo): foto do perfil e plano de fundo (cor sólida ou foto com desfoque)
+- Painel **Personalizar** (engrenagem no topo): foto do perfil, plano de fundo (cor sólida ou foto com desfoque) e exportar/importar a lista para levar a outro aparelho
 - Avisa quando há uma versão nova publicada
 
 Feito com HTML, CSS e JavaScript puros, sem build e sem dependências.

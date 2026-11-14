@@ -125,6 +125,19 @@
         </div>
       </fieldset>
 
+      <fieldset>
+        <legend>Seus dados</legend>
+        <p class="hint">A lista fica só neste aparelho. Para levar para outro, exporte aqui e importe lá (por WhatsApp, e-mail ou Drive). Importar soma as tarefas à lista, sem apagar nada.</p>
+        <div class="panel-row">
+          <button type="button" id="export-list" class="btn btn-ghost">Exportar lista</button>
+          <label class="btn btn-ghost file-btn">
+            Importar lista
+            <input type="file" id="import-file" accept=".json,application/json" class="sr-only">
+          </label>
+        </div>
+        <p id="data-status" class="hint" role="status"></p>
+      </fieldset>
+
       <div class="panel-actions">
         <button type="submit" class="btn btn-primary">Fechar</button>
       </div>
