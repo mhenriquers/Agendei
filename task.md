@@ -115,7 +115,7 @@ Cada subtarefa é pensada para ser resolvida de uma vez, mas sempre olhando o tr
 
 ## M4 — Camada PWA
 
-- [x] **M4.1** Gerar ícones PNG (192, 512 e 512 maskable com área segura de 80%). Usar um script PowerShell temporário com System.Drawing (já vem no Windows), guardado fora do repo. Só os PNG entram no repo.
+- [x] **M4.1** Gerar ícones PNG (192, 512 e 512 maskable com área segura de 80%). Usar um script PowerShell temporário com System.Drawing (já vem no Windows), guardado fora do repo. Só os PNG entram no repo. — Maskable refeito: foto em círculo de 80% (área segura) sobre fundo #c0c0c0.
 - [x] **M4.2** `manifest.webmanifest`: `name`, `short_name`, `description`, `lang: "pt-BR"`, `start_url: "./"`, `scope: "./"`, `display: "standalone"`, `background_color`, `theme_color` (iguais ao CSS), `icons` com caminhos `./icons/...` e `purpose` (`any` / `maskable`).
 - [x] **M4.3** `sw.js` — instalação: `CACHE_NAME = 'checklist-v1'`, lista `ASSETS` com caminhos relativos (`./`, `./index.html`, `./styles.css`, `./app.js`, `./manifest.webmanifest`, `./icons/*.png`), `cache.addAll` e `self.skipWaiting()`.
 - [x] **M4.4** `sw.js` — ativação: apagar caches com nome diferente de `CACHE_NAME` e `clients.claim()`.
@@ -150,8 +150,8 @@ Cada subtarefa é pensada para ser resolvida de uma vez, mas sempre olhando o tr
 ## M7 — Publicação no GitHub Pages
 
 - [x] **M7.1** Commit dos arquivos (mensagem clara) na `main`.
-- [ ] **M7.2** O remote `origin` já aponta para `github.com/mhenriquers/Agendei` (repo vazio). Fazer `git push` — **pede confirmação do usuário antes**.
-- [ ] **M7.3** Settings → Pages → Source: “Deploy from a branch”, branch `main`, pasta `/ (root)`.
+- [x] **M7.2** O remote `origin` já aponta para `github.com/mhenriquers/Agendei` (repo vazio). Fazer `git push` — **pede confirmação do usuário antes**.
+- [x] **M7.3** Settings → Pages → Source: “Deploy from a branch”, branch `main`, pasta `/ (root)`. — Estava como "GitHub Actions" sem workflow (404); trocado via `gh api` em 2026-11-14.
 - [ ] **M7.4** Abrir `https://<usuario>.github.io/<repo>/` e repetir os itens de PWA do M6.2 (instalar, offline, Lighthouse).
 - [ ] **M7.5** Testar instalação no celular (Android/Chrome e iOS/Safari “Adicionar à Tela de Início”).
 - [ ] **M7.6** Atualizar o README com a URL pública.
