@@ -514,7 +514,7 @@
   // pessoa começa a digitar.
   var bob = document.getElementById('bob');
   var BOB_DELAY = 500;
-  var BOB_DURATION = 8000;
+  var BOB_DURATION = 5000;
   var bobTimer = null;     // saída automática
   var bobHideTimer = null; // fim da animação de saída
   var bobDelayTimer = null;

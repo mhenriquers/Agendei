@@ -416,7 +416,7 @@ Contexto, regras e especificação estão no `claude.md`.
 
 ### T1.4 — `sw.js`
 
-- [ ] **T1.4.1** Incrementar `CACHE_NAME` (ex.: `checklist-v16` → `checklist-v17`). A lista `ASSETS` não muda (nenhum arquivo novo).
+- [ ] **T1.4.1** Incrementar `CACHE_NAME` (ex.: `checklist-v17` → `checklist-v18`). A lista `ASSETS` não muda (nenhum arquivo novo).
 
 ### T1.5 — Testar
 
@@ -445,7 +445,7 @@ Servir com `npx --yes http-server -c-1 -p 8000` e abrir `http://localhost:8000/`
   - item 3, trocar a regra "Adicionar é só o texto (urgência Normal, sem prazo); urgência e prazo são definidos no painel "Editar tarefa"." por "Adicionar é pelo botão "+", que abre o painel "Nova tarefa" com texto, urgência (Normal por padrão) e prazo (vazio por padrão).";
   - item 3, regra do máximo de 200 caracteres: trocar "(`maxlength` no input + corte no JS)" por "(`maxlength` no campo do painel + corte no JS)";
   - "Urgência e prazo", item "Painel Editar tarefa": acrescentar no fim "O mesmo painel serve para criar tarefa (ver "Botão +")."; e trocar "com o painel de edição aberto, espera" (item "Relógio") por "com o painel de tarefa aberto, espera";
-  - "Bob Esponja": trocar "Tocar no Bob ou no balão foca o campo "O que precisa fazer?" e ele sai. Ele também sai sozinho depois de 8 s ou quando o campo ganha foco. Não aparece se houver um painel aberto (`dialog[open]`) ou se o campo estiver com foco" por "Tocar no Bob ou no balão abre o painel "Nova tarefa" e ele sai. Ele também sai sozinho depois de 8 s ou quando um painel de tarefa abre. Não aparece se houver um painel aberto (`dialog[open]`)";
+  - "Bob Esponja": trocar "Tocar no Bob ou no balão foca o campo "O que precisa fazer?" e ele sai. Ele também sai sozinho depois de 5 s ou quando o campo ganha foco. Não aparece se houver um painel aberto (`dialog[open]`) ou se o campo estiver com foco" por "Tocar no Bob ou no balão abre o painel "Nova tarefa" e ele sai. Ele também sai sozinho depois de 5 s ou quando um painel de tarefa abre. Não aparece se houver um painel aberto (`dialog[open]`)";
   - seção `Botão "+" e painel "Nova tarefa"`: no título, trocar "(em implementação: tarefas T1 e T2 do `task.md`)" por "(em implementação: tarefa T2 do `task.md`)";
   - "Testes automatizados": acrescentar a bateria **botão + (N)** com o que ela cobre, e na bateria **Bob** trocar "toque leva ao campo, não aparece com painel aberto ou campo em uso" por "toque abre Nova tarefa, não aparece com painel aberto".
 - [ ] **T1.6.2** No `README.md`, nada muda (a linha "Adicionar, marcar como feito, editar e excluir itens" continua certa).
@@ -613,7 +613,7 @@ Servir com `npx --yes http-server -c-1 -p 8000` e abrir `http://localhost:8000/`
 
 ### T2.3 — `sw.js`
 
-- [ ] **T2.3.1** Incrementar `CACHE_NAME` de novo (ex.: `checklist-v17` → `checklist-v18`). `ASSETS` não muda.
+- [ ] **T2.3.1** Incrementar `CACHE_NAME` de novo (ex.: `checklist-v18` → `checklist-v19`). `ASSETS` não muda.
 
 ### T2.4 — Testar
 
